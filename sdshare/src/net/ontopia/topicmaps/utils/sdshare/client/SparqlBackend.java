@@ -8,6 +8,7 @@ import java.io.Writer;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.InputStreamReader;
+import java.net.URLEncoder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,7 @@ import com.hp.hpl.jena.rdf.arp.AResource;
 import com.hp.hpl.jena.rdf.arp.ALiteral;
 import com.hp.hpl.jena.rdf.arp.StatementHandler;
 
+import net.ontopia.utils.StringUtils;
 import net.ontopia.utils.StreamUtils;
 import net.ontopia.utils.OntopiaRuntimeException;
 import net.ontopia.topicmaps.utils.rdf.RDFUtils;
@@ -105,7 +107,8 @@ public class SparqlBackend extends AbstractBackend implements ClientBackendIF {
   }
   
   public static void doUpdate_(String endpoint, String statement) throws IOException {
-    log.warn("doUpdate: " + statement);
+    if (log.isDebugEnabled())
+      log.debug("doUpdate: " + statement);
 
     // FIXME: in time we may have to use Keep-Alive so that we don't
     // need to open new TCP connections all the time.
@@ -115,15 +118,13 @@ public class SparqlBackend extends AbstractBackend implements ClientBackendIF {
     // based on a kind of reverse-engineering of the protocol by guesswork.
 
     // (1) putting together the request
-    
-    statement = statement.replace('\n', '+');
-    statement = statement.replace(' ', '+');
+    statement = URLEncoder.encode(statement, "utf-8");
     byte rawdata[] = ("query=" + statement).getBytes("utf-8");
     
     HttpClient httpclient = new DefaultHttpClient();
     HttpPost httppost = new HttpPost(endpoint);
     ByteArrayEntity reqbody = new ByteArrayEntity(rawdata);
-    reqbody.setContentType("application/x-www-form-urlencoded");
+    reqbody.setContentType("application/x-www-form-urlencoded; charset=utf-8");
     httppost.setEntity(reqbody);
 
     // (2) retrieving the response
@@ -131,10 +132,12 @@ public class SparqlBackend extends AbstractBackend implements ClientBackendIF {
     HttpResponse response = httpclient.execute(httppost);
     HttpEntity resEntity = response.getEntity();
 
-    log.warn("Server response: " + response.getStatusLine());
+    if (log.isDebugEnabled())
+      log.debug("Server response: " + response.getStatusLine());
 
     String msg = StreamUtils.read(new InputStreamReader(resEntity.getContent()));
-    log.warn("Body: " + msg);
+    if (log.isDebugEnabled())
+      log.debug("Body: " + msg);
 
     if (response.getStatusLine().getStatusCode() != 200)
       throw new OntopiaRuntimeException("Error sending SPARQL query: " +
@@ -194,7 +197,7 @@ public class SparqlBackend extends AbstractBackend implements ClientBackendIF {
     }
 
     private void writeLiteral(ALiteral lit) throws IOException {
-      out.write("\"" + lit.toString().replace("\"", "\\\"") + "\" ");
+      out.write("\"" + lit.toString().replace("\\", "\\\\").replace("\"", "\\\"") + "\" ");
     }
 
     private void writeResource(AResource res) throws IOException {

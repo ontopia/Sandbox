@@ -203,6 +203,7 @@ public class FeedReaders {
     protected Set<String> iis;     // current <TopicII>s
     // content is set by a subclass, never by FragmentFeedReader itself
     protected String content;      // contents of <content>
+    protected String id;           // contents of <id>
 
     public FragmentFeedReader(String feedurl, long lastChange) {
       super(feedurl);
@@ -242,7 +243,8 @@ public class FeedReaders {
       if ((uri.equals(NS_SD) && name.equals("ServerSrcLocatorPrefix")) ||
           (uri.equals(NS_SD) && name.equals("TopicSI")) ||
           (uri.equals(NS_SD) && name.equals("TopicII")) ||
-          (uri.equals(NS_SD) && name.equals("TopicSL")))
+          (uri.equals(NS_SD) && name.equals("TopicSL")) ||
+          (uri.equals(NS_ATOM) && name.equals("id")))
         keep = true;
       
       else if (uri.equals(NS_ATOM) && name.equals("link") && inEntry) {
@@ -280,6 +282,9 @@ public class FeedReaders {
 
       else if (uri.equals(NS_SD) && name.equals("TopicII"))
         iis.add(buf.toString());
+
+      else if (uri.equals(NS_ATOM) && name.equals("id"))
+        id = buf.toString();
       
       else if (uri.equals(NS_ATOM) && name.equals("entry")) {
         // verify that we've got everything
@@ -289,7 +294,8 @@ public class FeedReaders {
         if (updated == -1)
           throw new RuntimeException("Fragment entry had no updated field");
         if (sis.isEmpty() && sls.isEmpty() && iis.isEmpty())
-          throw new RuntimeException("Fragment entry had no identity");
+          throw new RuntimeException("Fragment entry with id "+ id +
+                                     " had no identity");
         
         // check if this is a new fragment, or if we saw it before
         if (updated > lastChange) {
