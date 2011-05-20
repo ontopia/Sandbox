@@ -24,25 +24,29 @@ import net.ontopia.utils.StringUtils;
  * response to UI events (in which case we're outside the thread).
  */
 class SyncThread extends Thread {
+  private String appname; // unique name of app, used to name state file
   private boolean stopped;
   private boolean running;
-  private boolean loaded;
   private ClientBackendIF backend;
   private Collection<SyncEndpoint> endpoints;
   private Map<String, SyncSource> map;
   static Logger log = LoggerFactory.getLogger(SyncThread.class.getName());
 
   public SyncThread(ClientBackendIF backend,
-                    Collection<SyncEndpoint> endpoints) {
+                    Collection<SyncEndpoint> endpoints,
+                    String appname) {
     this.backend = backend;
     this.endpoints = endpoints;
-    this.loaded = false; // we load only when starting
+    this.appname = appname;
 
     // build a map of the sources for lookup purposes
     this.map = new HashMap();
     for (SyncEndpoint endpoint : endpoints)
       for (SyncSource source : endpoint.getSources())
         map.put(endpoint.getHandle() + " " + source.getHandle(), source);
+
+    // load client state
+    load();
   }
   
   public String getStatus() {
@@ -71,9 +75,6 @@ class SyncThread extends Thread {
   public void run() {
     stopped = false;
     running = true;
-
-    if (!loaded)
-      load();
       
     while (!stopped) {
       try {
@@ -170,7 +171,7 @@ class SyncThread extends Thread {
     // line-based text format. each line is:
     //   endpoint-handle source-handle lastchange
     File f = new File(System.getProperty("java.io.tmpdir"),
-                      "sdshare-client-state.txt");
+                      appname + "-state.txt");
     log.info("Saving state to " + f);
     FileWriter out = new FileWriter(f);
 
@@ -189,7 +190,7 @@ class SyncThread extends Thread {
   private void load() {
     try {
       File f = new File(System.getProperty("java.io.tmpdir"),
-                        "sdshare-client-state.txt");
+                        appname + "-state.txt");
       BufferedReader in = new BufferedReader(new FileReader(f));
       String line = in.readLine();
       while (line != null) {

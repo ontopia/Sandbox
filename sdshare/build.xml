@@ -34,6 +34,11 @@
     </javac>
   </target>
 
+  <!-- Clean -->  
+  <target name="clean" depends="init">
+    <delete dir="${build.classes}"/>
+  </target>
+  
   <!-- Make .jar file -->
   <target name="jar" depends="compile">
     <echo>Creating sdshare jar file...</echo>

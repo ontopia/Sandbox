@@ -14,13 +14,14 @@ import org.slf4j.LoggerFactory;
  */
 public class ClientManager {
   private ClientConfig config;
+  private String appname;
   private SyncThread thread;
   static Logger log = LoggerFactory.getLogger(ClientManager.class.getName());
 
-  public ClientManager(ClientConfig config) {
+  public ClientManager(ClientConfig config, String appname) {
     this.config = config;
-    this.thread = new SyncThread(config.getBackend(),
-                                 config.getEndpoints());
+    this.appname = appname;
+    makeThread();
   }
 
   public ClientConfig getConfig() {
@@ -45,7 +46,7 @@ public class ClientManager {
 
   public void stopThread() {
     thread.stopThread();
-    thread = new SyncThread(config.getBackend(), config.getEndpoints());
+    makeThread();
   }
 
   public void loadSnapshots() throws IOException, SAXException {
@@ -58,5 +59,10 @@ public class ClientManager {
 
   public SyncSource getSource(String key) {
     return thread.getSource(key);
+  }
+
+  private void makeThread() {
+    thread = new SyncThread(config.getBackend(), config.getEndpoints(),
+                            appname);
   }
 }

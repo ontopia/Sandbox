@@ -6,7 +6,7 @@
   ClientManager manager = (ClientManager) getServletContext().getAttribute("client-manager");
   if (manager == null) {
     ClientConfig cconfig = ClientConfig.readConfig();
-    manager = new ClientManager(cconfig);
+    manager = new ClientManager(cconfig, Utils.getWebappName(request));
     getServletContext().setAttribute("client-manager", manager);
   }
 
