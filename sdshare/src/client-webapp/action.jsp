@@ -30,5 +30,5 @@
     source.clearError();
   }
 
-  response.sendRedirect("/sdshare-client/");
+  response.sendRedirect("index.jsp");
 %>
