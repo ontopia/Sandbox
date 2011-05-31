@@ -4,6 +4,7 @@
   import="java.util.List,
           java.util.Collection,
           java.net.InetAddress,
+	  java.text.ParseException,
           net.ontopia.infoset.core.LocatorIF,
           net.ontopia.topicmaps.utils.sdshare.*,
           net.ontopia.topicmaps.utils.sdshare.client.*,
@@ -44,8 +45,23 @@
   List<ChangedTopic> changes;
   if (since == null)
      changes = tracker.getChangeFeed();
-  else
-     changes = tracker.getChangeFeed(FeedReaders.parseDateTime(since));
+  else {
+     long sincetime = 0;
+     try {
+       sincetime = FeedReaders.parseDateTime(since);       
+     } catch (RuntimeException e) {
+       // Web3 sends the old format, so we support a configuration option
+       // to ignore the parameter being in the wrong format. we rethrow
+       // the exception if it wasn't caused by the format, or the config flag
+       // isn't set.
+       ServletContext ctxt = pageContext.getServletContext();
+       String param = ctxt.getInitParameter("accept-bad-since-format");
+       boolean ignoresinceerror = (param != null && param.trim().equals("true"));
+       if (!(e.getCause() instanceof ParseException && ignoresinceerror))
+         throw e; 
+     }
+     changes = tracker.getChangeFeed(sincetime);
+  }
   for (ChangedTopic change : changes) {
     atom.startEntry("Topic with object ID " + change.getObjectId(),
                     prefix + "/" + change.getObjectId() + "/" + change.getTimestamp(),
