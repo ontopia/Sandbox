@@ -205,7 +205,7 @@ class SyncThread extends Thread {
       }
       in.close();
     } catch (IOException e) {
-      log.warn("Couldn't load state of sources", e);
+      log.warn("Couldn't load state of sources: " + e);
       // we carry on anyway, assuming that we don't need the state info.
       // the usual cause of this warning is that we don't have any state
       // yet.
