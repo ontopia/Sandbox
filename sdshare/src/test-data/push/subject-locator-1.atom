@@ -1,0 +1,23 @@
+<feed xmlns="http://www.w3.org/2005/Atom"
+      xmlns:sdshare="http://www.egovpt.org/sdshare">
+  <title>Fragments feed for beer.xtm</title>
+  <updated>2011-02-11T08:23:49Z</updated>
+  <author>
+    <name>Ontopia SDshare server</name>
+  </author>
+  <id>file:/Users/larsga/data/topicmaps/beer.xtm/fragments</id>
+  <sdshare:ServerSrcLocatorPrefix>file:/Users/larsga/data/topicmaps/beer.xtm</sdshare:ServerSrcLocatorPrefix>
+
+  <entry>
+    <title>Standard is deleted</title>
+    <updated>2008-07-17T15:55:21Z</updated>
+    <id>69CD5264-DB78-49c1-A7E4-04EECFA0AA85</id>
+    <sdshare:TopicSL>http://example.org/test</sdshare:TopicSL>
+    <content type="application/x-tm+xml;version=1.0">
+      <topicMap xmlns="http://www.topicmaps.org/xtm/1.0/"
+                xmlns:xlink="http://www.w3.org/1999/xlink">
+      </topicMap>
+    </content>
+  </entry>
+</feed>
+

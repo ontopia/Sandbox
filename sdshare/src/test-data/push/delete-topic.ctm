@@ -1,0 +1,4 @@
+
+http://psi.egovpt.org/standard/ISO19115
+  isa http://psi.example.org/standard;
+  - "ISO 19115:2003 Geographic Information - Metadata".

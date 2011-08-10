@@ -1,6 +1,7 @@
 
 package net.ontopia.topicmaps.utils.sdshare.client;
 
+import java.util.Iterator;
 import java.io.IOException;
 import org.xml.sax.SAXException;
 
@@ -13,7 +14,8 @@ public interface ClientFrontendIF {
 
   public SnapshotFeed getSnapshotFeed() throws IOException, SAXException;
 
-  public FragmentFeed getFragmentFeed(long lastChange)
+  // because of paging there may be more than one
+  public Iterator<FragmentFeed> getFragmentFeeds(long lastChange)
     throws IOException, SAXException;
   
 }

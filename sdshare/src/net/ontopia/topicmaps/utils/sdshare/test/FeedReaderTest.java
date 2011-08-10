@@ -69,6 +69,9 @@ public class FeedReaderTest extends AbstractTopicMapTestCase {
     assertEquals("incorrect server prefix",
                  "file:/Users/larsga/data/topicmaps/beer.xtm",
                  feed.getPrefix());
+    assertEquals("shouldn't have reference to next page",
+                 null,
+                 feed.getNextLink());
   }
 
   public void testEmptyFragmentFeed2() throws Exception {
@@ -77,6 +80,9 @@ public class FeedReaderTest extends AbstractTopicMapTestCase {
     assertEquals("incorrect server prefix",
                  "file:/Users/larsga/data/topicmaps/beer.xtm",
                  feed.getPrefix());
+    assertEquals("shouldn't have reference to next page",
+                 null,
+                 feed.getNextLink());
   }
 
   public void testFragmentFeed1() throws Exception {
@@ -86,6 +92,9 @@ public class FeedReaderTest extends AbstractTopicMapTestCase {
     assertEquals("incorrect server prefix",
                  "file:/Users/larsga/data/topicmaps/beer.xtm",
                  feed.getPrefix());
+    assertEquals("shouldn't have reference to next page",
+                 null,
+                 feed.getNextLink());
 
     Fragment fragment = feed.getFragments().iterator().next();
     Set<AtomLink> links = fragment.getLinks();
@@ -117,6 +126,87 @@ public class FeedReaderTest extends AbstractTopicMapTestCase {
     assertEquals("wrong MIME version", xtm.getVersion(), "1.0");
   }
 
+  public void testFragmentFeedPrecise() throws Exception {
+    FragmentFeed feed = readFragmentFeed("fragment-precise.xml");
+    assertEquals("wrong number of fragments",
+                 feed.getFragments().size(), 1);
+    assertEquals("incorrect server prefix",
+                 "file:/Users/larsga/data/topicmaps/beer.xtm",
+                 feed.getPrefix());
+    assertEquals("shouldn't have reference to next page",
+                 null,
+                 feed.getNextLink());
+
+    Fragment fragment = feed.getFragments().iterator().next();
+    Set<AtomLink> links = fragment.getLinks();
+    assertEquals("wrong number of links", links.size(), 2);
+
+    Iterator<AtomLink> it = links.iterator();
+    AtomLink rdflink = it.next();
+    AtomLink xtmlink = it.next();
+
+    if (!rdflink.getMIMEType().getType().equals("application/rdf+xml")) {
+      AtomLink tmp = rdflink;
+      rdflink = xtmlink;
+      xtmlink = tmp;
+    }
+
+    MIMEType xtm = xtmlink.getMIMEType();
+    assertEquals("wrong MIME type",
+                 rdflink.getMIMEType().toString(),
+                 "application/rdf+xml");
+    assertEquals("wrong MIME type", xtm.toString(),
+                 "application/x-tm+xml; version=1.0");
+    assertTrue("wrong link: " + xtmlink.getUri(),
+               xtmlink.getUri().endsWith("&syntax=xtm"));
+    assertTrue("wrong link: " + rdflink.getUri(),
+               rdflink.getUri().endsWith("&syntax=rdf"));
+
+    assertEquals("wrong MIME main type", xtm.getMainType(), "application");
+    assertEquals("wrong MIME subtype", xtm.getSubType(), "x-tm+xml");
+    assertEquals("wrong MIME version", xtm.getVersion(), "1.0");
+  }  
+
+  public void testFragmentFeedPaged() throws Exception {
+    FragmentFeed feed = readFragmentFeed("fragment-paged.xml");
+    assertEquals("wrong number of fragments",
+                 feed.getFragments().size(), 1);
+    assertEquals("incorrect server prefix",
+                 "file:/Users/larsga/data/topicmaps/beer.xtm",
+                 feed.getPrefix());
+    assertTrue("incorrect reference to next page",
+               feed.getNextLink().endsWith("fragment-paged-2.xml"));
+
+    Fragment fragment = feed.getFragments().iterator().next();
+    Set<AtomLink> links = fragment.getLinks();
+    assertEquals("wrong number of links", links.size(), 2);
+
+    Iterator<AtomLink> it = links.iterator();
+    AtomLink rdflink = it.next();
+    AtomLink xtmlink = it.next();
+
+    if (!rdflink.getMIMEType().getType().equals("application/rdf+xml")) {
+      AtomLink tmp = rdflink;
+      rdflink = xtmlink;
+      xtmlink = tmp;
+    }
+
+    MIMEType xtm = xtmlink.getMIMEType();
+    assertEquals("wrong MIME type",
+                 rdflink.getMIMEType().toString(),
+                 "application/rdf+xml");
+    assertEquals("wrong MIME type", xtm.toString(),
+                 "application/x-tm+xml; version=1.0");
+    assertTrue("wrong link: " + xtmlink.getUri(),
+               xtmlink.getUri().endsWith("&syntax=xtm"));
+    assertTrue("wrong link: " + rdflink.getUri(),
+               rdflink.getUri().endsWith("&syntax=rdf"));
+
+    assertEquals("wrong MIME main type", xtm.getMainType(), "application");
+    assertEquals("wrong MIME subtype", xtm.getSubType(), "x-tm+xml");
+    assertEquals("wrong MIME version", xtm.getVersion(), "1.0");
+  }
+  
   public void testPostFeed1() throws Exception {
     FragmentFeed feed = readPostFeed("push-1.xml");
     assertEquals("wrong number of fragments",
@@ -124,6 +214,9 @@ public class FeedReaderTest extends AbstractTopicMapTestCase {
     assertEquals("incorrect server prefix",
                  "file:/Users/larsga/data/topicmaps/beer.xtm",
                  feed.getPrefix());
+    assertEquals("shouldn't have reference to next page",
+                 null,
+                 feed.getNextLink());
 
     Fragment fragment = feed.getFragments().iterator().next();
     Set<AtomLink> links = fragment.getLinks();
@@ -132,6 +225,7 @@ public class FeedReaderTest extends AbstractTopicMapTestCase {
     assertTrue("no content in fragment", fragment.getContent() != null);
 
     // FIXME: should test contents of fragment, too
+    // FIXME: should test updated-times, too
   }
 
   public void testFragmentSince() throws Exception {

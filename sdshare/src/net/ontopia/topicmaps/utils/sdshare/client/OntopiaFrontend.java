@@ -2,6 +2,8 @@
 package net.ontopia.topicmaps.utils.sdshare.client;
 
 import java.util.Set;
+import java.util.Iterator;
+import java.util.Collections;
 import java.io.IOException;
 import java.io.StringWriter;
 import org.xml.sax.SAXException;
@@ -45,7 +47,7 @@ public class OntopiaFrontend implements ClientFrontendIF {
     throw new UnsupportedOperationException(); // FIXME: implement!
   }
 
-  public FragmentFeed getFragmentFeed(long lastChange)
+  public Iterator<FragmentFeed> getFragmentFeeds(long lastChange)
     throws IOException, SAXException {
     FragmentFeed feed = new FragmentFeed();
     // FIXME: presumably we need a title and all that jazz, too?
@@ -91,7 +93,7 @@ public class OntopiaFrontend implements ClientFrontendIF {
       feed.addFragment(f);
     }
 
-    return feed;
+    return Collections.singleton(feed).iterator();
   }
 
   private String makeFragment(TopicIF topic) {

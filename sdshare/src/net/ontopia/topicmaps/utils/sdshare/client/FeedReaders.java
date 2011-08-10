@@ -37,13 +37,18 @@ public class FeedReaders {
   static Logger log = LoggerFactory.getLogger(FeedReaders.class.getName());
   private static SimpleDateFormat format_wo_tz =
     new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+  private static SimpleDateFormat format_precise_wo_tz =
+    new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
   private static SimpleDateFormat format_with_tz =
     new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+  private static SimpleDateFormat format_precise_with_tz =
+    new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SZ");
   public static XMLReaderFactoryIF parserfactory =
     new DefaultXMLReaderFactory(); // public so we can modify for testing
   
   static {
     format_wo_tz.setTimeZone(TimeZone.getTimeZone("Z"));    
+    format_precise_wo_tz.setTimeZone(TimeZone.getTimeZone("Z"));    
   }
 
   // constants
@@ -57,11 +62,23 @@ public class FeedReaders {
   public static long parseDateTime(String date) {
     try {
       if (date.endsWith("Z"))
-        return format_wo_tz.parse(date).getTime();
+        return oneOf(date, format_wo_tz, format_precise_wo_tz);
       else
-        return format_with_tz.parse(date).getTime();
+        return oneOf(date, format_with_tz, format_precise_with_tz);
     } catch (ParseException e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  private static long oneOf(String date, SimpleDateFormat f1,
+                            SimpleDateFormat f2) throws ParseException {
+    try {
+      return f1.parse(date).getTime();
+    } catch (ParseException e) {
+      // this means we couldn't parse it with f1, so we try f2. if
+      // that fails we leave this method on that ParseException,
+      // which is fine.
+      return f2.parse(date).getTime();
     }
   }
   
@@ -246,8 +263,16 @@ public class FeedReaders {
           (uri.equals(NS_SD) && name.equals("TopicSL")) ||
           (uri.equals(NS_ATOM) && name.equals("id")))
         keep = true;
+
+      else if (uri.equals(NS_ATOM) && name.equals("link") && !inEntry) {
+        String rel = atts.getValue("rel");
+        if (rel == null || !rel.equals("next"))
+          return; // then we don't know what this is
+
+        String href = atts.getValue("href");
+        feed.setNextLink(feedurl.resolveAbsolute(href).getAddress());
       
-      else if (uri.equals(NS_ATOM) && name.equals("link") && inEntry) {
+      } else if (uri.equals(NS_ATOM) && name.equals("link") && inEntry) {
         String rel = atts.getValue("rel");
         if (rel == null || !rel.equals("alternate"))
           return; // then we don't know what this is

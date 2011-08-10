@@ -3,6 +3,7 @@ package net.ontopia.topicmaps.utils.sdshare.client;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Collection;
 import java.net.URL;
 import java.io.File;
@@ -137,14 +138,17 @@ class SyncThread extends Thread {
         // it was time, so we download the feed and go through the
         // actual fragments
         try {
-          FragmentFeed feed = source.getFragmentFeed();
-          log.info("FOUND " + feed.getFragments().size() + " fragments");
+          Iterator<FragmentFeed> it = source.getFragmentFeeds();
+          while (it.hasNext()) {
+            FragmentFeed feed = it.next();
+            log.info("FOUND " + feed.getFragments().size() + " fragments");
 
-           if (!feed.getFragments().isEmpty()) {
-            backend.applyFragments(endpoint, feed.getFragments());
-            for (Fragment fragment : feed.getFragments())
-              source.setLastChange(fragment.getUpdated());
-            found = true;
+            if (!feed.getFragments().isEmpty()) {
+              backend.applyFragments(endpoint, feed.getFragments());
+              for (Fragment fragment : feed.getFragments())
+                source.setLastChange(fragment.getUpdated());
+              found = true;
+            }
           }
         } catch (Throwable e) {
           // we log the error, and note it on the source. that stops further

@@ -1,0 +1,23 @@
+<topicMap>
+<topic number="1">
+<subjectIdentifiers>
+<locator>http://psi.topicmaps.org/iso13250/model/topic-name</locator>
+</subjectIdentifiers>
+</topic>
+<topic number="2">
+<subjectIdentifiers>
+<locator>http://psi.example.org/1</locator>
+<locator>http://psi.example.org/2</locator>
+</subjectIdentifiers>
+<itemIdentifiers>
+<locator>data/topicmaps/beer.xtm#iso-19115-2003</locator>
+</itemIdentifiers>
+<name number="1">
+<value>Topic 1</value>
+<type topicref="1"></type>
+<itemIdentifiers>
+<locator>data/topicmaps/beer.xtm#sd6</locator>
+</itemIdentifiers>
+</name>
+</topic>
+</topicMap>

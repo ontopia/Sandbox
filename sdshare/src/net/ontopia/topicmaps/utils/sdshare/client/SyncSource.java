@@ -1,6 +1,7 @@
 
 package net.ontopia.topicmaps.utils.sdshare.client;
 
+import java.util.Iterator;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import org.xml.sax.SAXException;
@@ -41,8 +42,8 @@ public class SyncSource {
     return frontend.getSnapshotFeed();
   }
 
-  public FragmentFeed getFragmentFeed() throws IOException, SAXException {
-    return frontend.getFragmentFeed(lastChange);
+  public Iterator<FragmentFeed> getFragmentFeeds() throws IOException, SAXException {
+    return frontend.getFragmentFeeds(lastChange);
   }
 
   /**

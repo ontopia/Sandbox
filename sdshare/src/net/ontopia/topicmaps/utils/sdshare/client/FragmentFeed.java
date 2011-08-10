@@ -10,6 +10,7 @@ import java.util.ArrayList;
 public class FragmentFeed {
   private String prefix;
   private List<Fragment> fragments;
+  private String next;
 
   public FragmentFeed() {
     this.fragments = new ArrayList<Fragment>();
@@ -30,5 +31,13 @@ public class FragmentFeed {
 
   public List<Fragment> getFragments() {
     return fragments;
+  }
+
+  public String getNextLink() {
+    return next;
+  }
+
+  public void setNextLink(String next) {
+    this.next = next;
   }
 }

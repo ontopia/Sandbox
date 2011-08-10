@@ -99,6 +99,30 @@
       <fileset dir="${build.wars}/sdshare-push"/>
     </war>
   </target>
+
+  <!-- Run tests -->
+  <target name="test" depends="init">
+    <property name="libdir" value="/Users/larsga/cvs-co/ontopia.old/lib"/>
+    <property name="thirddir" value="/Users/larsga/cvs-co/ontopia.old/3rdparty"/>
+    <path id="project.classpath.test">
+      <pathelement location="${basedir}/build/classes" />
+      <pathelement location="/Users/larsga/cvs-co/ontopia.old/build/classes/"/>
+      <pathelement location="${libdir}/junit-3.8.2.jar"/>
+      <pathelement location="${libdir}/java-getopt-1.0.9.jar"/>
+      <pathelement location="/Users/larsga/workspace/httpcomponents-client-4.0.3/lib/httpclient-4.0.3.jar"/>
+      <pathelement location="/Users/larsga/workspace/httpcomponents-core-4.1/lib/httpcore-4.1.jar"/>
+      <pathelement location="${thirddir}/jing.jar"/>
+    </path>
+    
+    <property name="test.path" value="${basedir}/src/test-data" />
+    <property name="test.config" value="${test.path}/tests.xml" />
+    <property name="test.name" value="sdshare" />
+    <java classname="net.ontopia.test.TestRunner" fork="true" classpathref="project.classpath.test">
+      <jvmarg value="-Dnet.ontopia.test.root=${test.path}" />
+      <arg value="${test.config}" />
+      <arg value="${test.name}" />
+    </java>
+  </target>
   
   <!-- Set up Cobertura instrumentation -->
   <!--target name="instrument" depends="init">
