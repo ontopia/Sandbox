@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import net.ontopia.infoset.core.LocatorIF;
 import net.ontopia.infoset.impl.basic.URILocator;
@@ -153,9 +155,19 @@ public class TopicMapUtils {
     
     String iiPrefix = hostRef + "/api/v1/topics/"; 
     
+    List<Pair<LocatorIF, TopicIF>> topicsToMerge = new ArrayList<Pair<LocatorIF, TopicIF>>();
     for (TopicIF topic : tm.getTopics()) {
-      updateItemIdentiersToREST(topic, iiPrefix);
+      Pair<LocatorIF, TopicIF> pair = updateItemIdentiersToREST(topic, iiPrefix);
+      if (pair != null) topicsToMerge.add(pair);
+      
       updateNullOccurrences(topic);
+    }
+    
+    for (Pair<LocatorIF, TopicIF> pair : topicsToMerge) {
+      TopicIF topic = (TopicIF) tm.getObjectByItemIdentifier(pair.getLeft());
+      if (topic != null) {
+        topic.merge(pair.getRight());
+      }
     }
     
     tmStore.commit();
@@ -164,7 +176,7 @@ public class TopicMapUtils {
     return tm;
   }
 
-  private void updateItemIdentiersToREST(TopicIF topic, String iiPrefix) {
+  private Pair<LocatorIF, TopicIF> updateItemIdentiersToREST(TopicIF topic, String iiPrefix) {
     Collection<LocatorIF> itemIdentifiers = topic.getItemIdentifiers();
     boolean containsRESTfulII = false;
     
@@ -176,13 +188,21 @@ public class TopicMapUtils {
     }
     
     if (!containsRESTfulII) {
-      for (LocatorIF itemIdentifier : itemIdentifiers) {
+      for (LocatorIF itemIdentifier : itemIdentifiers) {        
         if (itemIdentifier.getAddress().contains("#")) {
-          topic.addItemIdentifier(URILocator.create(iiPrefix + extractIdFromLocator(itemIdentifier)));            
+          LocatorIF restii = URILocator.create(iiPrefix + extractIdFromLocator(itemIdentifier));
+          TopicIF existingTopic = (TopicIF) topic.getTopicMap().getObjectByItemIdentifier(restii);
+          if (existingTopic == null) {
+            topic.addItemIdentifier(restii);
+          } else {
+            return new Pair<LocatorIF, TopicIF>(restii, topic);
+          }
           break;
         }
       }
     }
+    
+    return null;
   }
   
   /**

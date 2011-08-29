@@ -13,7 +13,7 @@ import org.restlet.data.Protocol;
 import org.restlet.resource.ClientResource;
 
 public class BasicTropicsTest {
-  private TropicsServer tropics = TropicsServer.create("tropics.props");
+  private TropicsServer tropics = TropicsServer.create("config/tropics.props");
   
   protected Client client = new Client(Protocol.HTTP);
   

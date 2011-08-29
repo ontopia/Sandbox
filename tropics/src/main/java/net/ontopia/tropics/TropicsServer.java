@@ -1,5 +1,6 @@
 package net.ontopia.tropics;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -38,8 +39,7 @@ public class TropicsServer {
     try {
       Properties tropicsProperties = new Properties();
 
-      ClassLoader cloader = TropicsServer.class.getClassLoader();
-      InputStream istream = cloader.getResourceAsStream("tropics.props");
+      InputStream istream = new FileInputStream(propertiesFilename);
       tropicsProperties.load(istream);
 
       port = Integer.parseInt(tropicsProperties.getProperty("net.ontopia.tropics.Port"));
