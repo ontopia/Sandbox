@@ -13,7 +13,8 @@ import org.restlet.data.Protocol;
 public class TropicsServer {
 
   /* DEFAULTS */
-  private static final int DEFAULT_PORT = 8182;
+  private static final int    DEFAULT_PORT    = 8182;
+  private static final String DEFAULT_ADDRESS = "localhost";
 
   /* RESTLET */
   private final Component component;
@@ -32,21 +33,20 @@ public class TropicsServer {
 
   public static TropicsServer create(String propertiesFilename) {
     int port = DEFAULT_PORT;
+    String address = DEFAULT_ADDRESS;
 
-    if (propertiesFilename != null) {
-      try {
-        Properties tropicsProperties = new Properties();
+    try {
+      Properties tropicsProperties = new Properties();
 
-        ClassLoader cloader = TropicsServer.class.getClassLoader();
-        InputStream istream = cloader.getResourceAsStream("tropics.props");
-        tropicsProperties.load(istream);
+      ClassLoader cloader = TropicsServer.class.getClassLoader();
+      InputStream istream = cloader.getResourceAsStream("tropics.props");
+      tropicsProperties.load(istream);
 
-        port = Integer.parseInt(tropicsProperties
-            .getProperty("net.ontopia.tropics.Port"));
-      } catch (IOException e) {
-        e.printStackTrace();
-        return null;
-      }
+      port = Integer.parseInt(tropicsProperties.getProperty("net.ontopia.tropics.Port"));
+      address = tropicsProperties.getProperty("net.ontopia.tropics.Address");
+    } catch (IOException e) {
+      e.printStackTrace();
+      return null;
     }
 
     // Create a new Topic Maps Repository.
@@ -55,8 +55,8 @@ public class TropicsServer {
     // Create a new Component.
     Component component = new Component();
 
-    // Add a new HTTP server listening on port 8182.
-    component.getServers().add(Protocol.HTTP, port);
+    // Add a new HTTP server listening on address (def.: localhost) and port (def.: 8182).
+    component.getServers().add(Protocol.HTTP, address, port);
 
     // Attach the sample application.
     TropicsApplicationV1 tropicsApplicationV1 = new TropicsApplicationV1(tmRepository);
