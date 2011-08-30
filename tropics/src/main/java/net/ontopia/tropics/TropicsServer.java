@@ -36,17 +36,19 @@ public class TropicsServer {
     int port = DEFAULT_PORT;
     String address = DEFAULT_ADDRESS;
 
-    try {
-      Properties tropicsProperties = new Properties();
+    if (propertiesFilename != null) {
+      try {
+        Properties tropicsProperties = new Properties();
 
-      InputStream istream = new FileInputStream(propertiesFilename);
-      tropicsProperties.load(istream);
+        InputStream istream = new FileInputStream(propertiesFilename);
+        tropicsProperties.load(istream);
 
-      port = Integer.parseInt(tropicsProperties.getProperty("net.ontopia.tropics.Port"));
-      address = tropicsProperties.getProperty("net.ontopia.tropics.Address");
-    } catch (IOException e) {
-      e.printStackTrace();
-      return null;
+        port = Integer.parseInt(tropicsProperties.getProperty("net.ontopia.tropics.Port"));
+        address = tropicsProperties.getProperty("net.ontopia.tropics.Address");
+      } catch (IOException e) {
+        e.printStackTrace();
+        return null;
+      }
     }
 
     // Create a new Topic Maps Repository.
