@@ -64,8 +64,9 @@ public class StartUpServlet extends HttpServlet {
       try {
         TrackerManager.registerTracker(tmid);
       } catch (OntopiaRuntimeException e) {
-        // FIXME: use more specific exception?
-        // means there was no such TM. we ignore the exception and carry on
+        // this *may* mean that there was no such exception. we give a
+        // warning, and soldier on manfully.
+        log.error("Exception registering change tracker", e);
       }      
     }
     log.debug("SDshare setup servlet initialized");
