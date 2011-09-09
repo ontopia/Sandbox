@@ -76,7 +76,7 @@
 			<flattenmapper />
 		</pathconvert>
 
-		<jar jarfile="${dist}/tropics.jar">
+		<jar jarfile="${dist}/tropics-ontopia.jar">
 			<fileset dir="${build.classes}" />
 			<manifest>
 				<attribute name="Built-By" value="${user.name}" />
