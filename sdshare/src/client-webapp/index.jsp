@@ -2,6 +2,7 @@
   language="java" 
   contentType="text/html; charset=utf-8"
   import="java.text.SimpleDateFormat,
+          net.ontopia.utils.StringUtils,
           net.ontopia.topicmaps.utils.sdshare.client.*,
           net.ontopia.topicmaps.nav2.core.*,
           net.ontopia.topicmaps.nav2.utils.*,
@@ -67,7 +68,9 @@ td, th { padding-right: 6pt }</style>
       <%
         if (ss.isBlockedByError()) {
       %>
-        <tr><td colspan=3><span style="color: red"><b><%= ss.getError() %></b></span> <br>
+        <tr><td colspan=3><span style="color: red">
+              <b><%= StringUtils.escapeHTMLEntities(ss.getError()) %></b>
+            </span> <br>
         <input type=submit name=clear<%= ix %> value="Clear">
         <input type=hidden name=id<%= ix++ %> 
           value="<%= endpoint.getHandle() %> <%= ss.getHandle() %>">
