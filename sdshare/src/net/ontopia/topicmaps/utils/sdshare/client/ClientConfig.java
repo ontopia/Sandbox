@@ -139,7 +139,9 @@ public class ClientConfig {
     
     public void endElement(String ns, String localname, String qname) {
       if (qname.equals("property")) {
-        if (property.equals("check-interval"))
+        if (endpoint != null)
+          endpoint.setProperty(property, buf.toString());
+        else if (property.equals("check-interval"))
           config.setCheckInterval(parse(buf.toString()));
         else if (property.equals("backend"))
           config.setBackend(buf.toString());
@@ -163,7 +165,9 @@ public class ClientConfig {
         endpoint.addSource(src);
         keep = false;
         buf.setLength(0);
-      }
+        
+      } else if (qname.equals("endpoint"))
+        endpoint = null; // so properties will be global again
     }
 
     private int parse(String num) {

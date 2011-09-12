@@ -1,6 +1,8 @@
 
 package net.ontopia.topicmaps.utils.sdshare.client;
 
+import java.util.Map;
+import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -13,10 +15,12 @@ import java.util.Collection;
 public class SyncEndpoint {
   private String handle;
   private Collection<SyncSource> sources;
+  private Map<String, String> properties;
 
   public SyncEndpoint(String handle) {
     this.handle = handle;
     this.sources = new ArrayList<SyncSource>();
+    this.properties = new HashMap();
   }
 
   public void addSource(SyncSource source) {
@@ -29,5 +33,13 @@ public class SyncEndpoint {
 
   public Collection<SyncSource> getSources() {
     return sources;
+  }
+
+  public String getProperty(String name) {
+    return properties.get(name);
+  }
+
+  public void setProperty(String name, String value) {
+    properties.put(name, value);
   }
 }
