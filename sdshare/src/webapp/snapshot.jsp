@@ -3,7 +3,8 @@
   contentType="application/x-tm+xml; charset=utf-8"
   import="net.ontopia.topicmaps.utils.sdshare.*,
           net.ontopia.topicmaps.entry.*,
-	  net.ontopia.topicmaps.core.*"
+	  net.ontopia.topicmaps.core.*,
+          net.ontopia.topicmaps.utils.rdf.*"
 %><%
  
   String tmid = request.getParameter("topicmap");
@@ -17,6 +18,8 @@
   TopicMapIF tm = ref.createStore(true).getTopicMap();
 
   TopicMapWriterIF writer = syntax.getWriter(response.getOutputStream(), "utf-8");
+  if (writer instanceof RDFTopicMapWriter)
+    ((RDFTopicMapWriter) writer).setPreserveScope(false);
   writer.write(tm);
 
 %>
