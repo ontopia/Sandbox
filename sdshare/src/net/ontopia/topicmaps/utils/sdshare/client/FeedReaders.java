@@ -393,9 +393,12 @@ public class FeedReaders {
     private SnapshotFeed feed;
     private Snapshot current; // INV: null outside of <entry> elements
 
+    protected Set<AtomLink> links; // links in current entry
+
     public SnapshotFeedReader(String feedurl) {
       super(feedurl);
       this.feed = new SnapshotFeed();
+      this.links = new CompactHashSet();
     }
 
     public SnapshotFeed getFeed() {
@@ -421,14 +424,22 @@ public class FeedReaders {
         if (href == null)
           throw new RuntimeException("No href attribute on <link>");
 
-        current.setSnapshotURI(feedurl.resolveAbsolute(href).getExternalForm());
+        String type = atts.getValue("type");
+        MIMEType mimetype = null;
+        if (type != null)
+          mimetype = new MIMEType(type);
+        
+        href = feedurl.resolveAbsolute(href).getExternalForm();
+        links.add(new AtomLink(mimetype, href));
       }
     }
 
     public void endElement(String uri, String name, String qname) {
       if (uri.equals(NS_ATOM) && name.equals("entry")) {
+        current.setLinks(links);
         feed.addSnapshot(current);
         current = null;
+        links = new CompactHashSet();
       } else if (uri.equals(NS_SD) && name.equals("ServerSrcLocatorPrefix"))
         feed.setPrefix(buf.toString());
 

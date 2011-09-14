@@ -1,24 +1,26 @@
 
 package net.ontopia.topicmaps.utils.sdshare.client;
 
+import java.util.Set;
+
 /**
  * PUBLIC: Represents an entry in a snapshot feed.
  */
 public class Snapshot {
-  private String uri;
   private long timestamp;
   private SnapshotFeed feed;
+  private Set<AtomLink> links;
 
   public Snapshot(SnapshotFeed feed) {
     this.feed = feed;
   }
 
-  public String getSnapshotURI() {
-    return uri;
+  public Set<AtomLink> getLinks() {
+    return links;
   }
 
-  public void setSnapshotURI(String uri) {
-    this.uri = uri;
+  public void setLinks(Set<AtomLink> links) {
+    this.links = links;
   }
 
   public long getUpdated() {

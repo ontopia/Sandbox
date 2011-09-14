@@ -37,7 +37,7 @@ public class SparqlBackend extends AbstractBackend implements ClientBackendIF {
   
   public void loadSnapshot(SyncEndpoint endpoint, Snapshot snapshot) {
     String graph = snapshot.getFeed().getPrefix();
-    String uri = snapshot.getSnapshotURI();
+    String uri = findPreferredLink(snapshot.getLinks()).getUri();
 
     // first, clear the graph
     doUpdate(endpoint.getHandle(),
@@ -67,6 +67,8 @@ public class SparqlBackend extends AbstractBackend implements ClientBackendIF {
     
     // first, remove all statements about the current topic
     doUpdate(endpoint.getHandle(),
+             // http://sourceforge.net/mailarchive/forum.php?thread_name=7DF4AA0F-2DAD-4A58-B3D5-1081CA05D94A%40openlinksw.com&forum_name=virtuoso-users
+             "DEFINE  sql:log-enable 2 " +
              "delete from <" + graph + "> " +
              "  { <" + subject + "> ?p ?v } " +
              "where " +
@@ -216,6 +218,8 @@ public class SparqlBackend extends AbstractBackend implements ClientBackendIF {
     private void insertBatch() throws IOException {
       log.debug("Posting batch after " + stmts + " statements");
       doUpdate(targeturi,
+               // http://sourceforge.net/mailarchive/forum.php?thread_name=7DF4AA0F-2DAD-4A58-B3D5-1081CA05D94A%40openlinksw.com&forum_name=virtuoso-users
+               "DEFINE  sql:log-enable 2 " +
                "insert data into <" + graphuri + "> { " +
                out.toString() + " }");
       out = new StringWriter();

@@ -37,7 +37,7 @@ public class OntopiaBackend extends AbstractBackend implements ClientBackendIF {
   public void loadSnapshot(SyncEndpoint endpoint, Snapshot snapshot) {
     TopicMapStoreIF store = null;
     try {
-      String url = snapshot.getSnapshotURI();
+      String url = findPreferredLink(snapshot.getLinks()).getUri();
       LocatorIF base = URILocator.create(snapshot.getFeed().getPrefix());
       
       XTMTopicMapReader reader = new XTMTopicMapReader(new URL(url).openConnection().getInputStream(), base);

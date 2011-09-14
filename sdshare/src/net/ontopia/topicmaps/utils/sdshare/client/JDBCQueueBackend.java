@@ -33,7 +33,7 @@ public class JDBCQueueBackend extends AbstractBackend
     InsertHandler handler = new InsertHandler(endpoint);
     try {
       // FIXME: should we delete contents first?
-      String sourceuri = snapshot.getSnapshotURI();
+      String sourceuri = findPreferredLink(snapshot.getLinks()).getUri();
       RDFUtils.parseRDFXML(sourceuri, handler);
       handler.close();
     } catch (IOException e) {
