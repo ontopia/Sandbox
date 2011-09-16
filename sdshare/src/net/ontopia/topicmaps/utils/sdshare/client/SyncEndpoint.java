@@ -16,6 +16,7 @@ public class SyncEndpoint {
   private String handle;
   private Collection<SyncSource> sources;
   private Map<String, String> properties;
+  private ClientBackendIF backend;
 
   public SyncEndpoint(String handle) {
     this.handle = handle;
@@ -41,5 +42,13 @@ public class SyncEndpoint {
 
   public void setProperty(String name, String value) {
     properties.put(name, value);
+  }
+
+  public ClientBackendIF getBackend() {
+    return backend;
+  }
+
+  public void setBackend(ClientBackendIF backend) {
+    this.backend = backend;
   }
 }

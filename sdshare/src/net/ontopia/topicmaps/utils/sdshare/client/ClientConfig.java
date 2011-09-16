@@ -123,6 +123,11 @@ public class ClientConfig {
       } else if (qname.equals("endpoint")) {
         String handle = atts.getValue("handle");
         endpoint = new SyncEndpoint(handle);
+
+        String backend = atts.getValue("backend");
+        if (backend != null)
+          endpoint.setBackend((ClientBackendIF) ObjectUtils.newInstance(backend));
+        
         config.addEndpoint(endpoint);
         
       } else if (qname.equals("source")) {
