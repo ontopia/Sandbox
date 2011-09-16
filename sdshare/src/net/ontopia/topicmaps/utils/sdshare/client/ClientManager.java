@@ -49,6 +49,11 @@ public class ClientManager {
     makeThread();
   }
 
+  public void shutdown() {
+    thread.stopThread();
+    // the sync() method stops the main loop, and takes care of saving etc
+  }
+
   public void loadSnapshots() throws IOException, SAXException {
     thread.loadSnapshots();
   }

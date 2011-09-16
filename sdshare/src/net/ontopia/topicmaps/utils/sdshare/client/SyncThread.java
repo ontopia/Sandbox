@@ -87,7 +87,7 @@ class SyncThread extends Thread {
       }
       
       try {
-        Thread.sleep(1000); // wait a second, then check again
+        Thread.sleep(100); // wait 0.1 second, then check again
       } catch (InterruptedException e) {
         // this exception is really annoying
       }

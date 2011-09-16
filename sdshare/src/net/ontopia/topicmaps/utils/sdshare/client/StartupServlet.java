@@ -27,4 +27,10 @@ public class StartupServlet extends HttpServlet {
 
     manager.startThread();
   }
+
+  public void destroy() {
+    ClientManager manager = (ClientManager)
+      getServletContext().getAttribute("client-manager");
+    manager.shutdown();
+  }
 }
