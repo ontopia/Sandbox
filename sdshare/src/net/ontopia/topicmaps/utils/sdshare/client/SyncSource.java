@@ -26,6 +26,7 @@ public class SyncSource {
    * by the server. In milliseconds since epoch.
    */
   private long lastChange;
+  private boolean active;
   private static String DEF_FRONT =
     "net.ontopia.topicmaps.utils.sdshare.client.AtomFrontend";
   
@@ -90,6 +91,17 @@ public class SyncSource {
   public boolean isBlockedByError() {
     return error != null;
   }
+
+  /**
+   * Returns true iff this source is being sync-ed from right now.
+   */
+  public boolean isActive() {
+    return active;
+  }
+  
+  public void setActive(boolean active) {
+    this.active = active;
+  }  
 
   public String getError() {
     return error;

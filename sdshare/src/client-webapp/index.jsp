@@ -75,6 +75,13 @@ td, th { padding-right: 6pt }</style>
         <input type=hidden name=id<%= ix++ %> 
           value="<%= endpoint.getHandle() %> <%= ss.getHandle() %>">
      <% } %>
+
+      <%
+        if (ss.isActive()) {
+      %>
+        <tr><td colspan=3><span style="color: green">
+              <b>currently active</b></span>
+     <% } %>
    <% } %>
    </table>
   <% } %>

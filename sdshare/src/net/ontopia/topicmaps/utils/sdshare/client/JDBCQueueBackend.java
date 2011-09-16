@@ -42,15 +42,19 @@ public class JDBCQueueBackend extends AbstractBackend
   }
 
   public void applyFragments(SyncEndpoint endpoint, List<Fragment> fragments) {
+    String tblprefix = "";
+    if (endpoint.getProperty("table-prefix") != null)
+      tblprefix = endpoint.getProperty("table-prefix");
     DatabaseType dbtype = getDBType(endpoint);
     Statement stmt = getConnection(endpoint);
     try {
       try {
         for (Fragment f : fragments)
+          // FIXME: this is getting ugly. too many parameters.
           writeResource(stmt,
                         f.getTopicSIs().iterator().next(),
                         findPreferredLink(f.getLinks()).getUri(),
-                        dbtype);
+                        dbtype, tblprefix);
         stmt.getConnection().commit();
       } finally {
         stmt.close();
@@ -61,7 +65,7 @@ public class JDBCQueueBackend extends AbstractBackend
   }
 
   private void writeResource(Statement stmt, String topicsi, String datauri,
-                             DatabaseType dbtype)
+                             DatabaseType dbtype, String tblprefix)
     throws SQLException {
     String idvalue;
     if (dbtype == DatabaseType.H2)
@@ -69,8 +73,8 @@ public class JDBCQueueBackend extends AbstractBackend
     else
       idvalue = "resource_seq.nextval";
     
-    stmt.executeUpdate("insert into UPDATED_RESOURCES values (" +
-                       "  " + idvalue + ", '" + escape(topicsi) + "', '" +
+    stmt.executeUpdate("insert into " + tblprefix + "UPDATED_RESOURCES " +
+                       "values (" + idvalue + ", '" + escape(topicsi) + "', '" +
                        escape(datauri) + "')");
   }
 
@@ -161,16 +165,22 @@ public class JDBCQueueBackend extends AbstractBackend
   public class InsertHandler implements StatementHandler {
     private Statement stmt;
     private DatabaseType dbtype;
+    private String tblprefix;
     
     public InsertHandler(SyncEndpoint endpoint) {
       this.stmt = getConnection(endpoint);
       this.dbtype = getDBType(endpoint);
+
+      // FIXME: next three lines are duplicated
+      this.tblprefix = "";
+      if (endpoint.getProperty("table-prefix") != null)
+        this.tblprefix = endpoint.getProperty("table-prefix");
     }
 
     public void statement(AResource sub, AResource pred, ALiteral lit) {
       try {
         // FIXME: this doesn't handle blank nodes
-        writeResource(stmt, sub.getURI(), null, dbtype);
+        writeResource(stmt, sub.getURI(), null, dbtype, tblprefix);
       } catch (SQLException e) {
         throw new RuntimeException(e);
       }
@@ -179,7 +189,7 @@ public class JDBCQueueBackend extends AbstractBackend
     public void statement(AResource sub, AResource pred, AResource obj) {
       try {
         // FIXME: this doesn't handle blank nodes
-        writeResource(stmt, sub.getURI(), null, dbtype);
+        writeResource(stmt, sub.getURI(), null, dbtype, tblprefix);
       } catch (SQLException e) {
         throw new RuntimeException(e);
       }

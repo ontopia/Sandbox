@@ -12,7 +12,7 @@
     <servlet-class>
       net.ontopia.topicmaps.utils.sdshare.client.StartupServlet
     </servlet-class>
-    <load-on-startup>-1</load-on-startup> <!-- 1 == on, but also 0 == on -->
+    <load-on-startup>1</load-on-startup> <!-- 1 == on, but also 0 == on -->
     <init-param>
       <param-name>app-name</param-name>
       <param-value>sdshare-client</param-value>

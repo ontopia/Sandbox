@@ -135,7 +135,8 @@ class SyncThread extends Thread {
           continue;
         if (!source.isTimeToCheck() && !force)
           continue;
-        
+
+        source.setActive(true);
         log.debug("Checking source " + source.getHandle() + " in " +
                   endpoint.getHandle());
 
@@ -161,6 +162,7 @@ class SyncThread extends Thread {
           source.setError(e.getMessage());
         }
 
+        source.setActive(false);
         // this notes the time of the last update time for this source,
         // even if it failed.
         source.updated();
