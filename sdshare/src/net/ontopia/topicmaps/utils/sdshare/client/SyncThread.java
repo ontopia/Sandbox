@@ -128,6 +128,10 @@ class SyncThread extends Thread {
     boolean found = false;
     for (SyncEndpoint endpoint : endpoints) {
       log.trace("Checking endpoint " + endpoint.getHandle());
+      ClientBackendIF thebackend = endpoint.getBackend();
+      if (thebackend == null)
+        thebackend = backend;
+      
       for (SyncSource source : endpoint.getSources()) {
         // verify that it's time to check this source now, and that the source
         // hasn't failed.
@@ -149,7 +153,7 @@ class SyncThread extends Thread {
             log.info("FOUND " + feed.getFragments().size() + " fragments");
 
             if (!feed.getFragments().isEmpty()) {
-              backend.applyFragments(endpoint, feed.getFragments());
+              thebackend.applyFragments(endpoint, feed.getFragments());
               for (Fragment fragment : feed.getFragments())
                 source.setLastChange(fragment.getUpdated());
               found = true;

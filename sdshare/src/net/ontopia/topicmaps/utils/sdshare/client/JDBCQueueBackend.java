@@ -30,6 +30,11 @@ public class JDBCQueueBackend extends AbstractBackend
   //static Logger log = LoggerFactory.getLogger(JDBCQueueBackend.class.getName());
   
   public void loadSnapshot(SyncEndpoint endpoint, Snapshot snapshot) {
+    // FIXME: the problem is that we don't know the URI to retrieve
+    // information about each subject from, and there's no general way
+    // to find out. we *might* be able to solve it using
+    // configuration, perhaps, even though it would be very ugly.
+
     InsertHandler handler = new InsertHandler(endpoint);
     try {
       // FIXME: should we delete contents first?
@@ -71,7 +76,7 @@ public class JDBCQueueBackend extends AbstractBackend
     if (dbtype == DatabaseType.H2)
       idvalue = "NULL";
     else
-      idvalue = "resource_seq.nextval";
+      idvalue = tblprefix + "resource_seq.nextval";
     
     stmt.executeUpdate("insert into " + tblprefix + "UPDATED_RESOURCES " +
                        "values (" + idvalue + ", '" + escape(topicsi) + "', '" +
