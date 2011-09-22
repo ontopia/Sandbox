@@ -163,7 +163,7 @@ class SyncThread extends Thread {
           // we log the error, and note it on the source. that stops further
           // updates from the source, until we are told that we can continue.
           log.warn("Source " + source.getHandle() + " failed", e);
-          source.setError(e.getMessage());
+          source.setError(e.toString());
         }
 
         source.setActive(false);

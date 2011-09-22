@@ -217,7 +217,9 @@ public class JDBCQueueBackend extends AbstractBackend
   }
   
   private static DatabaseType getDBType(String dbtype) {
-    if (dbtype.equals("h2"))
+    if (dbtype == null)
+      throw new OntopiaRuntimeException("duke.database property not set");
+    else if (dbtype.equals("h2"))
       return DatabaseType.H2;
     else if (dbtype.equals("oracle"))
       return DatabaseType.ORACLE;
