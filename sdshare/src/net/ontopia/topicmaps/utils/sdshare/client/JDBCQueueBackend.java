@@ -2,6 +2,8 @@
 package net.ontopia.topicmaps.utils.sdshare.client;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Properties;
 import java.io.IOException;
 import java.sql.Driver;
@@ -14,6 +16,7 @@ import com.hp.hpl.jena.rdf.arp.AResource;
 import com.hp.hpl.jena.rdf.arp.ALiteral;
 import com.hp.hpl.jena.rdf.arp.StatementHandler;
 
+import net.ontopia.utils.StringUtils;
 import net.ontopia.utils.OntopiaRuntimeException;
 import net.ontopia.topicmaps.utils.rdf.RDFUtils;
 
@@ -28,12 +31,12 @@ import net.ontopia.topicmaps.utils.rdf.RDFUtils;
 public class JDBCQueueBackend extends AbstractBackend
   implements ClientBackendIF {
   //static Logger log = LoggerFactory.getLogger(JDBCQueueBackend.class.getName());
+  private static Collection<String> ignore_uri_prefixes;
+  private String prevsi; // primitive caching
   
   public void loadSnapshot(SyncEndpoint endpoint, Snapshot snapshot) {
-    // FIXME: the problem is that we don't know the URI to retrieve
-    // information about each subject from, and there's no general way
-    // to find out. we *might* be able to solve it using
-    // configuration, perhaps, even though it would be very ugly.
+    if (endpoint.getProperty("ignore-uri-prefixes") != null)
+      setIgnoreUriPrefixes(endpoint.getProperty("ignore-uri-prefixes"));
 
     InsertHandler handler = new InsertHandler(endpoint);
     try {
@@ -50,16 +53,19 @@ public class JDBCQueueBackend extends AbstractBackend
     String tblprefix = "";
     if (endpoint.getProperty("table-prefix") != null)
       tblprefix = endpoint.getProperty("table-prefix");
+    if (endpoint.getProperty("ignore-uri-prefixes") != null)
+      setIgnoreUriPrefixes(endpoint.getProperty("ignore-uri-prefixes"));
+    
     DatabaseType dbtype = getDBType(endpoint);
     Statement stmt = getConnection(endpoint);
     try {
       try {
-        for (Fragment f : fragments)
+        for (Fragment f : fragments) {
           // FIXME: this is getting ugly. too many parameters.
-          writeResource(stmt,
-                        f.getTopicSIs().iterator().next(),
-                        findPreferredLink(f.getLinks()).getUri(),
+          String psi = f.getTopicSIs().iterator().next();
+          writeResource(stmt, psi, findPreferredLink(f.getLinks()).getUri(),
                         dbtype, tblprefix);
+        }
         stmt.getConnection().commit();
       } finally {
         stmt.close();
@@ -72,15 +78,39 @@ public class JDBCQueueBackend extends AbstractBackend
   private void writeResource(Statement stmt, String topicsi, String datauri,
                              DatabaseType dbtype, String tblprefix)
     throws SQLException {
+    // check if we already saw this topicsi in previous statement
+    if (prevsi != null && prevsi.equals(topicsi))
+      return;
+    prevsi = topicsi;
+    
+    // check if this is a URL pattern we don't want to queue
+    if (ignore_uri_prefixes != null)
+      for (String prefix : ignore_uri_prefixes)
+        if (topicsi.startsWith(prefix))
+          return;
+
+    // check if the URL is already there
+    ResultSet rs = stmt.executeQuery("select id from " + tblprefix +
+                                     "UPDATED_RESOURCES where URI = '" +
+                                     escape(topicsi) + "'");
+    boolean present = rs.next();
+    rs.close();
+    if (present)
+      return; // it's already there, so we don't need to do anything
+    
+    // ok, carry on
     String idvalue;
     if (dbtype == DatabaseType.H2)
       idvalue = "NULL";
     else
       idvalue = tblprefix + "resource_seq.nextval";
-    
+
+    String escaped_data_uri = "NULL";
+    if (datauri != null)
+      escaped_data_uri = "'" + escape(datauri) + "'";
     stmt.executeUpdate("insert into " + tblprefix + "UPDATED_RESOURCES " +
-                       "values (" + idvalue + ", '" + escape(topicsi) + "', '" +
-                       escape(datauri) + "')");
+                       "values (" + idvalue + ", '" + escape(topicsi) + "', " +
+                       escaped_data_uri + ")");
   }
 
   public int getLinkScore(AtomLink link) {
@@ -142,12 +172,14 @@ public class JDBCQueueBackend extends AbstractBackend
     if (present)
       return;
 
-    if (dbtype == DatabaseType.H2)
+    if (dbtype == DatabaseType.H2) {
       stmt.executeUpdate("create table UPDATED_RESOURCES ( " +
                          "  id int auto_increment primary key, " +
                          "  uri varchar not null, " +
                          "  fragment_uri varchar )");
-    else if (dbtype == DatabaseType.ORACLE) {
+
+      stmt.executeUpdate("create index URI_IX on UPDATED_RESOURCES (uri)");
+    } else if (dbtype == DatabaseType.ORACLE) {
       // first we must create a sequence, so we can get autoincrement
       stmt.executeUpdate("create sequence resource_seq " +
                          "start with 1 increment by 1 nomaxvalue");
@@ -158,11 +190,20 @@ public class JDBCQueueBackend extends AbstractBackend
                          "  uri varchar(200) not null, " +
                          "  fragment_uri(400) varchar, " +
                          "CONSTRAINT updated_pk PRIMARY KEY (id))");
+
+      stmt.executeUpdate("create index URI_IX on UPDATED_RESOURCES (uri)");
     }
   }
 
   private String escape(String strval) {
     return strval.replace("'", "''");
+  }
+
+  private void setIgnoreUriPrefixes(String ignores) {
+    ignore_uri_prefixes = new ArrayList<String>();
+    String[] tokens = StringUtils.split(ignores);
+    for (int ix = 0; ix < tokens.length; ix++)
+      ignore_uri_prefixes.add(tokens[ix]);
   }
 
   // ===== Writing INSERT-format triples
