@@ -150,19 +150,21 @@ class SyncThread extends Thread {
           Iterator<FragmentFeed> it = source.getFragmentFeeds();
           while (it.hasNext()) {
             FragmentFeed feed = it.next();
-            log.info("FOUND " + feed.getFragments().size() + " fragments");
+            log.debug("FOUND " + feed.getFragments().size() + " fragments");
 
             if (!feed.getFragments().isEmpty()) {
               thebackend.applyFragments(endpoint, feed.getFragments());
-              for (Fragment fragment : feed.getFragments())
+              for (Fragment fragment : feed.getFragments()) {
                 source.setLastChange(fragment.getUpdated());
+                source.addFragmentCount(1);
+              }
               found = true;
             }
           }
         } catch (Throwable e) {
           // we log the error, and note it on the source. that stops further
           // updates from the source, until we are told that we can continue.
-          log.warn("Source " + source.getHandle() + " failed", e);
+          log.error("Source " + source.getHandle() + " failed", e);
           source.setError(e.toString());
         }
 

@@ -27,6 +27,10 @@ public class SyncSource {
    */
   private long lastChange;
   private boolean active;
+  /**
+   * Number of fragments returned by this source since we booted.
+   */
+  private int fragcount;
   private static String DEF_FRONT =
     "net.ontopia.topicmaps.utils.sdshare.client.AtomFrontend";
   
@@ -113,6 +117,14 @@ public class SyncSource {
 
   public void clearError() {
     this.error = null;
+  }
+
+  public int getFragmentCount() {
+    return fragcount;
+  }
+
+  public void addFragmentCount(int increment) {
+    fragcount += increment;
   }
 
   private ClientFrontendIF instantiate(String handle, String klass) {

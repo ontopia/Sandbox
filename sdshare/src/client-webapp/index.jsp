@@ -58,12 +58,13 @@ td, th { padding-right: 6pt }</style>
     <h2><%= endpoint.getHandle() %></h2>
 
     <table>
-    <tr><th>Source <th>Last change <th>Last sync
+    <tr><th>Source <th>Last change <th>Last sync <th>Fragments
 
     <% for (SyncSource ss : endpoint.getSources()) { %>
       <tr><td><%= ss.getHandle() %>
           <td><%= format(ss.getLastChange()) %>
           <td><%= format(ss.getLastCheck()) %>
+          <td><%= ss.getFragmentCount() %>
 
       <%
         if (ss.isBlockedByError()) {
