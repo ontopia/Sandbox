@@ -18,7 +18,7 @@ public abstract class AbstractBackend {
    * set is non-empty.
    */
   public AtomLink findPreferredLink(Set<AtomLink> links) {
-    int highest = 0;
+    int highest = -1;
     AtomLink preferred = null;
     for (AtomLink link : links) {
       int score = getLinkScore(link);
