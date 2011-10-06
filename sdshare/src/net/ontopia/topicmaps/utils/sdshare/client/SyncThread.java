@@ -110,12 +110,8 @@ class SyncThread extends Thread {
         thebackend = backend;
       
       log.info("Getting snapshots for " + endpoint.getHandle());
-      for (SyncSource source : endpoint.getSources()) {
-        log.info("Loading from " + source.getHandle());        
-        SnapshotFeed feed = source.getSnapshotFeed();
-        Snapshot snapshot = feed.getSnapshots().get(0);
-        thebackend.loadSnapshot(endpoint, snapshot);
-      }
+      for (SyncSource source : endpoint.getSources())
+        endpoint.loadSnapshot(source);
     }
   }
 
@@ -133,6 +129,9 @@ class SyncThread extends Thread {
         thebackend = backend;
       
       for (SyncSource source : endpoint.getSources()) {
+        // check that we haven't been stopped by the UI
+        if (stopped)
+          break;
         // verify that it's time to check this source now, and that the source
         // hasn't failed.
         if (source.isBlockedByError())

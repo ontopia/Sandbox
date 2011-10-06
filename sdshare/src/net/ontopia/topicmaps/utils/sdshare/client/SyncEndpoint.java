@@ -5,6 +5,12 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.io.IOException;
+
+import org.xml.sax.SAXException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * PUBLIC: Represents an endpoint which sources are synchronized
@@ -17,6 +23,7 @@ public class SyncEndpoint {
   private Collection<SyncSource> sources;
   private Map<String, String> properties;
   private ClientBackendIF backend;
+  static Logger log = LoggerFactory.getLogger(SyncEndpoint.class.getName());
 
   public SyncEndpoint(String handle) {
     this.handle = handle;
@@ -26,6 +33,7 @@ public class SyncEndpoint {
 
   public void addSource(SyncSource source) {
     sources.add(source);
+    source.setEndpoint(this);
   }
 
   public String getHandle() {
@@ -50,5 +58,12 @@ public class SyncEndpoint {
 
   public void setBackend(ClientBackendIF backend) {
     this.backend = backend;
+  }
+
+  public void loadSnapshot(SyncSource source) throws IOException, SAXException {
+    log.info("Loading snapshot from " + source.getHandle());        
+    SnapshotFeed feed = source.getSnapshotFeed();
+    Snapshot snapshot = feed.getSnapshots().get(0);
+    backend.loadSnapshot(this, snapshot);
   }
 }

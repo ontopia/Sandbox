@@ -28,8 +28,25 @@
   }
 %>
 
+<script>
+function swap(rowix) {
+  var row = document.getElementById("actionrow" + rowix);
+  var button = document.getElementById("button" + rowix);
+
+  if (row.className == "hidden") {
+    row.className = "visible";
+    button.value = "-";
+  } else {
+    row.className = "hidden";
+    button.value = "+";
+  }
+}
+
+</script>
+
 <style>th { text-align: left; }
-td, th { padding-right: 6pt }</style>
+td, th { padding-right: 6pt }
+.hidden { display: none }</style>
 <title>Ontopia SDshare client</title>
 
 <h1>SDshare client</h1>
@@ -47,8 +64,6 @@ td, th { padding-right: 6pt }</style>
 <% } %>
 </p>
 
-<p><input type=submit name=snapshots value="Download snapshots"></p>
-
 <p>Endpoints to synchronize into:</p>
 
 <%
@@ -65,22 +80,29 @@ td, th { padding-right: 6pt }</style>
           <td><%= format(ss.getLastChange()) %>
           <td><%= format(ss.getLastCheck()) %>
           <td><%= ss.getFragmentCount() %>
-
+	  <td><input type=button value="+" onclick="javascript:swap(<%= ix %>);"
+                     id=button<%= ix %>>
       <%
         if (ss.isBlockedByError()) {
       %>
-        <tr><td colspan=3><span style="color: red">
+        <tr><td colspan=4><span style="color: red">
               <b><%= StringUtils.escapeHTMLEntities(ss.getError()) %></b>
             </span> <br>
         <input type=submit name=clear<%= ix %> value="Clear">
-        <input type=hidden name=id<%= ix++ %> 
-          value="<%= endpoint.getHandle() %> <%= ss.getHandle() %>">
      <% } %>
+
+      <tr id="actionrow<%= ix %>" class=hidden
+          ><td colspan=4>
+          <input type=button name=stop<%= ix %> value="Stop" disabled>
+          <input type=button name=restart<%= ix %> value="Restart" disabled>
+          <input type=submit name=snapshot<%= ix %> value="Snapshot">
+          <input type=hidden name=id<%= ix++ %> 
+            value="<%= endpoint.getHandle() %> <%= ss.getHandle() %>">
 
       <%
         if (ss.isActive()) {
       %>
-        <tr><td colspan=3><span style="color: green">
+        <tr><td colspan=4><span style="color: green">
               <b>currently active</b></span>
      <% } %>
    <% } %>

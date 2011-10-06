@@ -337,7 +337,7 @@ public class FeedReaders {
             f.setTopicSLs(sls);
           feed.addFragment(f);
         } else
-          log.info("Found old fragment, updated: " + updated);
+          log.debug("Found old fragment, updated: " + updated);
 
         // reset tracking fields
         links = new CompactHashSet();

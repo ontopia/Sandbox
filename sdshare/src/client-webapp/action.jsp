@@ -22,12 +22,15 @@
 
   int no = Integer.parseInt(request.getParameter("number"));
   for (int ix = 0; ix < no; ix++) {
-    if (request.getParameter("clear" + ix) == null)
-      continue;
-
     String key = request.getParameter("id" + ix);
     SyncSource source = manager.getSource(key);
-    source.clearError();
+
+    if (request.getParameter("clear" + ix) != null)
+      source.clearError();
+    else if (request.getParameter("snapshot" + ix) != null) {
+      SyncEndpoint endpoint = source.getEndpoint();
+      endpoint.loadSnapshot(source);
+    }
   }
 
   response.sendRedirect("index.jsp");

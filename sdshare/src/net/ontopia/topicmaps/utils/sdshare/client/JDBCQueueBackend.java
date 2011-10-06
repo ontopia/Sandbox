@@ -125,6 +125,9 @@ public class JDBCQueueBackend extends AbstractBackend
   private Statement getConnection(SyncEndpoint endpoint) {
     String jdbcuri = endpoint.getHandle();
     String driverklass = endpoint.getProperty("driver-class");
+    if (driverklass == null)
+      throw new RuntimeException("Endpoint property driver-class not set on " +
+                                 "endpoint " + jdbcuri);
     String username = endpoint.getProperty("username");
     String password = endpoint.getProperty("password");
     
