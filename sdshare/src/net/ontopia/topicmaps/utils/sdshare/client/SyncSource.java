@@ -90,7 +90,11 @@ public class SyncSource {
    * interval.
    */
   public boolean isTimeToCheck() {
-    return System.currentTimeMillis() >= lastCheck + (checkInterval * 1000);
+    int secs_to_wait = checkInterval;
+    if (isBlockedByError())
+      secs_to_wait = checkInterval * 6; // FIXME: default. make configurable
+    
+    return System.currentTimeMillis() >= lastCheck + (secs_to_wait * 1000);
   }
 
   public boolean isBlockedByError() {

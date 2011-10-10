@@ -132,10 +132,8 @@ class SyncThread extends Thread {
         // check that we haven't been stopped by the UI
         if (stopped)
           break;
-        // verify that it's time to check this source now, and that the source
-        // hasn't failed.
-        if (source.isBlockedByError())
-          continue;
+        // verify that it's time to check this source now (this takes errors
+        // into account, and delays checking correspondingly)
         if (!source.isTimeToCheck() && !force)
           continue;
 
@@ -160,9 +158,14 @@ class SyncThread extends Thread {
               found = true;
             }
           }
+
+          // we didn't see any errors, so clear any recorded errors for this
+          // source
+          source.clearError();
         } catch (Throwable e) {
-          // we log the error, and note it on the source. that stops further
-          // updates from the source, until we are told that we can continue.
+          // we log the error, and note it on the source. that delays further
+          // updates from the source, until we are told that we can continue,
+          // or the errors end.
           log.error("Source " + source.getHandle() + " failed", e);
           source.setError(e.toString());
         }
