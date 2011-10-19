@@ -60,25 +60,26 @@ public class FeedReaders {
    * since epoch (same as System.currentTimeMillis()).
    */
   public static long parseDateTime(String date) {
-    try {
-      if (date.endsWith("Z"))
-        return oneOf(date, format_wo_tz, format_precise_wo_tz);
-      else
-        return oneOf(date, format_with_tz, format_precise_with_tz);
-    } catch (ParseException e) {
-      throw new RuntimeException(e);
-    }
+    if (date.endsWith("Z"))
+      return oneOf(date, format_wo_tz, format_precise_wo_tz);
+    else
+      return oneOf(date, format_with_tz, format_precise_with_tz);
   }
 
-  private static long oneOf(String date, SimpleDateFormat f1,
-                            SimpleDateFormat f2) throws ParseException {
+  private static long oneOf(String date, SimpleDateFormat f1, 
+                            SimpleDateFormat f2) {
     try {
       return f1.parse(date).getTime();
     } catch (ParseException e) {
       // this means we couldn't parse it with f1, so we try f2. if
       // that fails we leave this method on that ParseException,
       // which is fine.
-      return f2.parse(date).getTime();
+      try {
+        return f2.parse(date).getTime();
+      } catch (ParseException e2) {
+        throw new OntopiaRuntimeException("Couldn't parse date '" +
+                                          date + "'", e2);
+      }
     }
   }
   
