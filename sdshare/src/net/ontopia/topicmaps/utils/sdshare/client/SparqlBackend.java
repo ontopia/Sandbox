@@ -57,7 +57,10 @@ public class SparqlBackend extends AbstractBackend implements ClientBackendIF {
     String uri = findPreferredLink(fragment.getLinks()).getUri();
 
     // FIXME: we don't support more than one SI at a time yet.
-    assert fragment.getTopicSIs().size() == 1;
+    if (fragment.getTopicSIs().size() != 1)
+      throw new OntopiaRuntimeException("Fragment had " +
+                                        fragment.getTopicSIs().size() +
+                                        " SIs, which we cannot handle");
     String subject = fragment.getTopicSIs().iterator().next();
 
     // WARN: this is the Virtuoso dialect of SPARQL Update, so these
@@ -200,7 +203,33 @@ public class SparqlBackend extends AbstractBackend implements ClientBackendIF {
     }
 
     private void writeLiteral(ALiteral lit) throws IOException {
-      out.write("\"" + lit.toString().replace("\\", "\\\\").replace("\"", "\\\"") + "\" ");
+      String litstr = lit.toString();
+      char[] tmp = new char[litstr.length() * 4];
+      int pos = 0;
+      for (int ix = 0; ix < litstr.length(); ix++) {
+        char ch = litstr.charAt(ix);
+        if (ch == '\\') {
+          tmp[pos++] = '\\';
+          tmp[pos++] = '\\';
+        } else if (ch == '"') {
+          tmp[pos++] = '\\';
+          tmp[pos++] = '"';
+        } else if (ch == 0xD) {
+          tmp[pos++] = '\\';
+          tmp[pos++] = 'r';
+        } else if (ch == 0xA) {
+          tmp[pos++] = '\\';
+          tmp[pos++] = 'n';
+        } else if (ch == 0x9) {
+          tmp[pos++] = '\\';
+          tmp[pos++] = 't';
+        } else
+          tmp[pos++] = ch;
+      }
+      
+      out.write('\"');
+      out.write(tmp, 0, pos);
+      out.write("\" ");
     }
 
     private void writeResource(AResource res) throws IOException {
