@@ -190,7 +190,7 @@ class SyncThread extends Thread {
     //   endpoint-handle source-handle lastchange
     File f = new File(System.getProperty("java.io.tmpdir"),
                       appname + "-state.txt");
-    log.info("Saving state to " + f);
+    log.debug("Saving state to " + f);
     FileWriter out = new FileWriter(f);
 
     for (SyncEndpoint endpoint : endpoints)
