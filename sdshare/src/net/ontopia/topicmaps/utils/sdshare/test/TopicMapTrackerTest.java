@@ -272,8 +272,8 @@ public class TopicMapTrackerTest extends AbstractTopicMapTestCase {
     // change all topics
     testChangeAllTopics();
 
-    // wait 100 ms
-    waitms(100);
+    // wait 200 ms
+    waitms(200);
 
     // change a topic, and observe that all old changes are gone
     testAddedTopic();
@@ -287,15 +287,12 @@ public class TopicMapTrackerTest extends AbstractTopicMapTestCase {
     // change two topics
     testTwoChanges();
 
-    // wait 6 ms
-    waitms(6);
+    // wait 200 ms
+    waitms(200);
 
     // create a new topic
     TopicMapBuilderIF builder = topicmap.getBuilder();
     TopicIF topic = builder.makeTopic();
-
-    // wait another 6 ms
-    waitms(6);
 
     // now only the new topic should be visible
     List<ChangedTopic> changes = tracker.getChangeFeed();
@@ -305,6 +302,32 @@ public class TopicMapTrackerTest extends AbstractTopicMapTestCase {
     assertTrue("wrong object ID on recorded change",
                change.getObjectId().equals(topic.getObjectId()));
   }
+
+  public void testChangeExpiryCrash() {
+    // setting a fairly long expiry time so that changes don't magically
+    // disappear while we are working
+    tracker.setExpiryTime(10);
+
+    // change two topics
+    testTwoChanges();
+
+    // wait
+    waitms(110);
+
+    // change one of the two topics again
+    TopicMapBuilderIF builder = topicmap.getBuilder();
+    TopicIF jill = getTopicById("jill");
+    builder.makeTopicName(jill, "A third name");
+
+    // now only the new jill change should be visible
+    List<ChangedTopic> changes = tracker.getChangeFeed();
+    assertEquals("only made one change, but more changes in feed",
+                 1, changes.size());
+    ChangedTopic change = changes.get(0);
+    assertTrue("wrong object ID on recorded change",
+               change.getObjectId().equals(jill.getObjectId()));
+  }
+  
 
   public void testSinceNoChanges() {
     assertTrue("found changes in feed, despite no changes having been made",

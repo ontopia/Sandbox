@@ -123,7 +123,7 @@ public class TopicMapTracker implements TopicMapListenerIF {
     this.dribblefile = dribblefile;
     loadDribbleFile(); // dribbler is set up in here
   }
-  
+    
   private synchronized void modified(ChangedTopic o) {
     expireOldChanges();
     int pos = findDuplicate(o);
@@ -245,7 +245,7 @@ public class TopicMapTracker implements TopicMapListenerIF {
     // is it time to expire yet?
     if (System.currentTimeMillis() - lastExpired < Math.min(100, expirytime))
       return;
-    
+
     // find the position of the first change to keep
     long expireolderthan = System.currentTimeMillis() - expirytime;
     int keepfrom;
@@ -259,12 +259,16 @@ public class TopicMapTracker implements TopicMapListenerIF {
     // List doesn't have a method for it. ArrayList does, but it's protected.
     // therefore we do it brute-force, and hope this is efficient enough.
     if (keepfrom > 0) {
-      if (keepfrom == changes.size())
+      if (keepfrom == changes.size()) {
         changes.clear(); // throw away everything
-      else
+        idmap.clear();
+      } else {
+        for (ChangedTopic t : changes.subList(0, keepfrom))
+          idmap.remove(t.getObjectId());
         changes = new ArrayList(changes.subList(keepfrom, changes.size()));
+      }
     }
-    
+
     // update timestamp
     lastExpired = System.currentTimeMillis();
   }
