@@ -1162,6 +1162,35 @@
       <resourceData>knowledge-synergy-logo.png</resourceData>
     </occurrence>
   </topic>
+  <topic id="morpheus">
+    <instanceOf>
+      <topicRef xlink:href="#id508"></topicRef>
+    </instanceOf>
+    <baseName>
+      <instanceOf>
+        <topicRef xlink:href="#id5"></topicRef>
+      </instanceOf>
+      <baseNameString>Morpheus Kennistechnologie BV</baseNameString>
+    </baseName>
+    <occurrence>
+      <instanceOf>
+        <topicRef xlink:href="#id511"></topicRef>
+      </instanceOf>
+      <resourceData>http://en.mssm.nl</resourceData>
+    </occurrence>
+    <occurrence>
+      <instanceOf>
+        <topicRef xlink:href="#id111"></topicRef>
+      </instanceOf>
+      <resourceData>&lt;p&gt;&lt;p&gt;Morpheus is a Dutch knowledge engineering company, founded in 1999. Morpheus delivers solutions to facilitate knowledge intensive processes in the field of security, publishing and education. The services it delivers include consulting activities, design and implementation. We enrich information sources, improve search facilities, develop information management-, content publishing- and knowledge tools.&lt;/p&gt;&lt;p&gt;Our clients are, among others, the Dutch police and the House of Representatives. Morpheus is an Ontopia expert (providing two committers to the project) and has vast expertise on the Topic Maps standard and semantics in general. For several years active in standardization-bodies and the topic maps community and a regular contributor in international topic maps conferences such as Topic Maps (in Norway) and TMRA (Germany).&lt;/p&gt;&lt;/p&gt;</resourceData>
+    </occurrence>
+    <occurrence>
+      <instanceOf>
+        <topicRef xlink:href="#id185"></topicRef>
+      </instanceOf>
+      <resourceData>morpheus-logo.jpg</resourceData>
+    </occurrence>
+  </topic>
   <topic id="id722">
     <instanceOf>
       <topicRef xlink:href="#id3"></topicRef>
