@@ -1,0 +1,86 @@
+# Languages are encoded according to ISO 639-3 (http://www.sil.org/iso639-3/codes.asp)
+# Scripts are encoded according to ISO 15924 (http://unicode.org/iso15924/iso15924-codes.html)
+#   except IPA because IPA is considered latin characters with an extension block, like te Spanish ñ or german ß etc.
+# Countries and regions are encoded according to ISO 3166 (http://nl.wikipedia.org/wiki/ISO_3166)
+
+%prefix topicmaps http://psi.topicmaps.org/iso13250/model/
+%prefix i http://psi.elcid.org/connex/
+%prefix concept http://psi.elcid.org/connex/concepts/
+%prefix expression http://psi.elcid.org/connex/expressions/
+%prefix lang http://psi.elcid.org/connex/languages/
+%prefix script http://psi.elcid.org/connex/scripts/
+
+topicmaps:topic-name
+	- "Topic name" .
+
+topicmaps:supertype
+	- "Supertype" .
+
+topicmaps:subtype
+	- "Subtype" .
+
+topicmaps:supertype-subtype
+	- "Supertype-subtype" ;
+	- "subtypes" @ topicmaps:supertype ;
+	- "supertypes" @ topicmaps:subtype .
+
+i:concept
+	- "Concept" .
+
+i:expression
+	- "Expression" .
+
+i:expresses
+	- "Expresses" ;
+	- "expresses" @ i:expression ;
+	- "expressed by" @ i:concept .
+
+i:iso639-3
+	- "ISO 639-3" .
+
+i:iso15924
+	- "ISO 15924" .
+
+lang:eng
+	- "English" .
+
+lang:nld
+	- "Dutch" .
+
+script:latn
+	- "Latin" .
+
+script:cyrl
+	- "Cyrillic" .
+
+script:ipa
+	- "IPA" .
+
+lang:stressed
+	- "Stressed" .
+
+lang:pronounciation
+	- "Pronounciation" .
+
+concept:informal-greeting isa i:concept ;
+	 - "Informal greeting" ~ i:term-for-informal-greeting .
+
+expression:hello isa i:expression ;
+	- "Hello" @ lang:eng ("Helló" @ lang:stressed) ("/(hĕ-lōˈ, hə-)/" @ lang:pronounciation) ;
+	i:iso639-3 : "eng" ;
+	i:iso15924 : "latn" @i:pure ~i:latn-script-hello-expression .
+
+i:expresses(i:expression : expression:hello, i:concept : concept:informal-greeting)
+
+i:pure
+	- "Pure script - no alternative characters" .
+
+i:latn-script-hello-expression
+	- "Latin script writing of \"Hello\"" .
+
+i:term-for-informal-greeting
+	- "Term for informal greeting" ;
+	i:weight : 2 .
+
+i:weight
+	- "Weight of topic" .
