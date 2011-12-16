@@ -119,9 +119,10 @@ public class SparqlBackend extends AbstractBackend implements ClientBackendIF {
     // FIXME: in time we may have to use Keep-Alive so that we don't
     // need to open new TCP connections all the time.
     
-    // WARN: it doesn't look like the spec actually describes the update
-    // protocol, but we can probably guess what it looks like. so this is
-    // based on a kind of reverse-engineering of the protocol by guesswork.
+    // WARN: it doesn't look like the SPARQL spec actually describes
+    // the update protocol, but we can probably guess what it looks
+    // like. so this is based on a kind of reverse-engineering of the
+    // protocol by guesswork.
 
     // (1) putting together the request
     statement = URLEncoder.encode(statement, "utf-8");
