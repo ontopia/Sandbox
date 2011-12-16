@@ -35,7 +35,7 @@ public abstract class TopicMapPreferencesFactory implements PreferencesFactory {
 			Preferences userPreferences = TopicMapPreferences.createUserRoot(topicMapReference, this); 
 			userRoots.put(key, userPreferences);
 		}
-		return systemRoots.get(key);
+		return userRoots.get(key);
 	}
 
 	protected String getSystemKey() {
