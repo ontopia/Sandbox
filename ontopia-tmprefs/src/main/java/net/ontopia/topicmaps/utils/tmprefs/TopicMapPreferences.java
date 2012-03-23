@@ -201,7 +201,9 @@ public class TopicMapPreferences extends AbstractPreferences {
 				}
 				for (String key : propertiesRemoved) {
 					TopicIF propertyType = fetchPropertyType(key, topicmap);
-					for (OccurrenceIF occurrence : topic.getOccurrences()) {
+					OccurrenceIF[] occurrencesArray = topic.getOccurrences().toArray(new OccurrenceIF[0]);
+					for (int i = 0; i < occurrencesArray.length; i++) {
+						OccurrenceIF occurrence = occurrencesArray[i];
 						if (propertyType.equals(occurrence.getType())) {
 							occurrence.remove();
 						}
