@@ -134,8 +134,6 @@ public class TopicMapPreferences extends AbstractPreferences {
 
 		flushSpi();
 		
-		logger.debug("TopicMapPreferences.syncSpi  INVOKED for path: " + this.absolutePath());
-
 		if (isRemoved()) {
 			return;
 		}
@@ -175,7 +173,7 @@ public class TopicMapPreferences extends AbstractPreferences {
 
 	public synchronized void flushSpi() throws BackingStoreException {
 		
-		logger.debug("TopicMapPreferences.flushSpi INVOKED for path: " + this.absolutePath());
+		logger.debug("Flushing " + this);
 		
 		TopicMapStoreIF store = null;
 		try {
@@ -185,15 +183,18 @@ public class TopicMapPreferences extends AbstractPreferences {
 			
 			if (isRemoved()) {
 				if (topic != null) {
+					logger.debug("Removing " + this);
 					removeTopic(topicmap, topic);
 				}
 			} else {
 				topic = fetchTopic(topicmap);
 				for (String key : propertiesAdded) {
+					logger.debug("Adding property '" + key + "' = '" + properties.get(key) + "'");
 					TopicIF propertyType = fetchPropertyType(key, topicmap);
 					topicmap.getBuilder().makeOccurrence(topic, propertyType, properties.get(key));
 				}
 				for (String key : propertiesModified) {
+					logger.debug("Modifying property '" + key + "' = '" + properties.get(key) + "'");
 					TopicIF propertyType = fetchPropertyType(key, topicmap);
 					for (OccurrenceIF occurrence : topic.getOccurrences()) {
 						if (propertyType.equals(occurrence.getType())) {
@@ -202,6 +203,7 @@ public class TopicMapPreferences extends AbstractPreferences {
 					}
 				}
 				for (String key : propertiesRemoved) {
+					logger.debug("Removing property '" + key + "'");
 					TopicIF propertyType = fetchPropertyType(key, topicmap);
 					OccurrenceIF[] occurrencesArray = topic.getOccurrences().toArray(new OccurrenceIF[0]);
 					for (int i = 0; i < occurrencesArray.length; i++) {
@@ -310,6 +312,7 @@ public class TopicMapPreferences extends AbstractPreferences {
 		// specs: "If this method is invoked on a node that has been removed with the removeNode() method, 
 		//        flushSpi() is invoked on this node, but not on others."
 		// so, first remove children, then topic itself
+		logger.debug("Removing topic " + TopicStringifiers.toString(topic));
 		for (TopicIF child : fetchChildren(topicmap, topic)) {
 			removeTopic(topicmap, child);
 		}
