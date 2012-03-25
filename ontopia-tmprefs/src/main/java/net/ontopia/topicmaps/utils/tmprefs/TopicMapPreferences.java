@@ -100,11 +100,13 @@ public class TopicMapPreferences extends AbstractPreferences {
 	public void putSpi(String key, String value) {
 		properties.put(key, value);
 		handlePropertyStatusChange(key, propertiesStored.contains(key) ? PropertyStatus.MODIFIED : PropertyStatus.ADDED);
+		propertiesStored.add(key);
 	}
 
 	public void removeSpi(String key) {
 		properties.remove(key);
 		handlePropertyStatusChange(key, propertiesStored.contains(key) ? PropertyStatus.REMOVED : PropertyStatus.NONE);
+		propertiesStored.remove(key);
 	}
 
 	public TopicMapPreferences childSpi(String name) {
