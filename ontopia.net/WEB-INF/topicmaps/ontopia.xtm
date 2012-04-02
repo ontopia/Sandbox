@@ -5235,6 +5235,58 @@
       <resourceData>4</resourceData>
     </occurrence>
   </topic>
+  <topic id="id000000001">
+    <instanceOf>
+      <topicRef xlink:href="#post"></topicRef>
+    </instanceOf>
+    <subjectIdentity>
+      <resourceRef xlink:href="http://ontopia.wordpress.com/2012/02/02/ontopia-5-2-0-released/"></resourceRef>
+    </subjectIdentity>
+    <baseName>
+      <instanceOf>
+        <topicRef xlink:href="#id5"></topicRef>
+      </instanceOf>
+      <baseNameString>Ontopia 5.2.0 released</baseNameString>
+    </baseName>
+    <occurrence>
+      <instanceOf>
+        <topicRef xlink:href="#date"></topicRef>
+      </instanceOf>
+      <resourceData>2012-02-02 10:33:00</resourceData>
+    </occurrence>
+    <occurrence>
+      <instanceOf>
+        <topicRef xlink:href="#description"></topicRef>
+      </instanceOf>
+      <resourceData>After a almost a year Ontopia 5.2.0 has just been released. This is a major release which fixes several bugs and adds some minor new functionality. It’s also the first full Maven release. For the full details, please see the release notes.</resourceData>
+    </occurrence>
+  </topic>
+  <topic id="id000000002">
+    <instanceOf>
+      <topicRef xlink:href="#post"></topicRef>
+    </instanceOf>
+    <subjectIdentity>
+      <resourceRef xlink:href="http://ontopia.wordpress.com/2012/03/30/ontopia-5-2-1-released/"></resourceRef>
+    </subjectIdentity>
+    <baseName>
+      <instanceOf>
+        <topicRef xlink:href="#id5"></topicRef>
+      </instanceOf>
+      <baseNameString>Ontopia 5.2.1 released</baseNameString>
+    </baseName>
+    <occurrence>
+      <instanceOf>
+        <topicRef xlink:href="#date"></topicRef>
+      </instanceOf>
+      <resourceData>2012-03-30 10:53:00</resourceData>
+    </occurrence>
+    <occurrence>
+      <instanceOf>
+        <topicRef xlink:href="#description"></topicRef>
+      </instanceOf>
+      <resourceData>Ontopia 5.2.1 has just been released. This is a minor release which fixes the vizigator and vizlet in the distribution. For the full details, please see the release notes.</resourceData>
+    </occurrence>
+  </topic>
   <topic id="id3463">
     <instanceOf>
       <topicRef xlink:href="#post"></topicRef>
@@ -21848,6 +21900,40 @@ recent activity&lt;/A&gt;. &lt;/P&gt;&lt;H2&gt;Contact &lt;/H2&gt;&lt;P&gt;To 
         <topicRef xlink:href="#id376"></topicRef>
       </roleSpec>
       <topicRef xlink:href="#id958"></topicRef>
+    </member>
+  </association>
+  <association>
+    <instanceOf>
+      <topicRef xlink:href="#has-post"></topicRef>
+    </instanceOf>
+    <member>
+      <roleSpec>
+        <topicRef xlink:href="#blog"></topicRef>
+      </roleSpec>
+      <topicRef xlink:href="#the-blog"></topicRef>
+    </member>
+    <member>
+      <roleSpec>
+        <topicRef xlink:href="#post"></topicRef>
+      </roleSpec>
+      <topicRef xlink:href="#id000000001"></topicRef>
+    </member>
+  </association>
+  <association>
+    <instanceOf>
+      <topicRef xlink:href="#has-post"></topicRef>
+    </instanceOf>
+    <member>
+      <roleSpec>
+        <topicRef xlink:href="#blog"></topicRef>
+      </roleSpec>
+      <topicRef xlink:href="#the-blog"></topicRef>
+    </member>
+    <member>
+      <roleSpec>
+        <topicRef xlink:href="#post"></topicRef>
+      </roleSpec>
+      <topicRef xlink:href="#id000000002"></topicRef>
     </member>
   </association>
 </topicMap>
