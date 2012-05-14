@@ -1,15 +1,14 @@
 
 package net.ontopia.topicmaps.utils.tmprefs;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import java.util.prefs.PreferencesFactory;
-import java.util.prefs.BackingStoreException;
-
 import net.ontopia.topicmaps.core.TopicIF;
 import net.ontopia.topicmaps.core.TopicMapIF;
 import net.ontopia.topicmaps.entry.TopicMapReferenceIF;
-import java.util.Map;
-import java.util.HashMap;
 
 public abstract class TopicMapPreferencesFactory implements PreferencesFactory {
 
@@ -22,6 +21,7 @@ public abstract class TopicMapPreferencesFactory implements PreferencesFactory {
 		String key = getSystemKey();
 		if (systemRoots.get(key) == null) {
 			TopicMapReferenceIF topicMapReference = getSystemTopicMapReference(key);
+			if (topicMapReference == null) throw new RuntimeException(new BackingStoreException("System: Topicmap with key '" + key + "' was not resolved!"));
 			Preferences systemPreferences = TopicMapPreferences.createSystemRoot(topicMapReference, this);
 			systemRoots.put(key, systemPreferences);
 		}
@@ -32,6 +32,7 @@ public abstract class TopicMapPreferencesFactory implements PreferencesFactory {
 		String key = getUserKey();
 		if (userRoots.get(key) == null) {
 			TopicMapReferenceIF topicMapReference = getUserTopicMapReference(key);
+			if (topicMapReference == null) throw new RuntimeException(new BackingStoreException("User: Topicmap with key '" + key + "' was not resolved!"));
 			Preferences userPreferences = TopicMapPreferences.createUserRoot(topicMapReference, this); 
 			userRoots.put(key, userPreferences);
 		}
