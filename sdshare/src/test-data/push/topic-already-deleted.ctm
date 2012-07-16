@@ -1,0 +1,4 @@
+
+# no topic here, because it's been deleted in the target topic map.
+# now we'll try pushing an empty fragment to see if this will cause a
+# crash.

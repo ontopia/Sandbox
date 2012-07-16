@@ -335,7 +335,7 @@ public class TopicMapTracker implements TopicMapListenerIF {
     } catch (FileNotFoundException e) {
       // we assume this means that the file hasn't been created yet, so
       // we just warn, create the file, and carry on
-      log.warn("No dribble file found at '" + dribblefile + "', creating one");
+      log.warn("No dribble file found at '{}', creating one", dribblefile);
     }
     
     // (3) write out clean dribble file

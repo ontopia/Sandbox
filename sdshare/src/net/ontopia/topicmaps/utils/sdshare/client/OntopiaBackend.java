@@ -152,6 +152,13 @@ public class OntopiaBackend extends AbstractBackend implements ClientBackendIF {
       // we create it
       ltopic = topicmap.getBuilder().makeTopic();
 
+    // it's possible that the topic is deleted in the source, and also
+    // already deleted in the target (e.g because the fragment has
+    // already been processed). in that case we don't need to do
+    // anything.
+    if (ltopic == null && ftopic == null)
+      return;
+    
     // there might not be a fragment topic, which indicates that it's been
     // deleted. in this case we make a blank dummy that will cause everything
     // to be deleted, and the local topic to be deleted at the end.

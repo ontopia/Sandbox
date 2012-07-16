@@ -14,8 +14,10 @@ import org.slf4j.LoggerFactory;
 import net.ontopia.utils.CompactHashSet;
 import net.ontopia.utils.OntopiaRuntimeException;
 import net.ontopia.infoset.core.LocatorIF;
+import net.ontopia.infoset.impl.basic.URILocator;
 import net.ontopia.topicmaps.core.TopicIF;
 import net.ontopia.topicmaps.core.TopicMapIF;
+import net.ontopia.topicmaps.core.TopicMapStoreIF;
 import net.ontopia.topicmaps.entry.TopicMaps;
 import net.ontopia.topicmaps.entry.TopicMapReferenceIF;
 import net.ontopia.topicmaps.entry.TopicMapRepositoryIF;
@@ -72,6 +74,15 @@ public class OntopiaFrontend implements ClientFrontendIF {
         fragment = makeFragment(null);
       } else {
         TopicIF rtopic = (TopicIF) topicmap.getObjectById(topic.getObjectId());
+
+        // we need to check if this topic has any identifiers at all.
+        // because if it doesn't, then we will be in deep trouble
+        // later.
+        if (rtopic.getItemIdentifiers().isEmpty() &&
+            rtopic.getSubjectIdentifiers().isEmpty() &&
+            rtopic.getSubjectLocators().isEmpty())
+          addIdentifier(ref, topic.getObjectId());
+            
         for (LocatorIF si : rtopic.getSubjectIdentifiers())
           sis.add(si.getExternalForm());
         for (LocatorIF sl : rtopic.getSubjectLocators())
@@ -109,5 +120,22 @@ public class OntopiaFrontend implements ClientFrontendIF {
       throw new OntopiaRuntimeException(e);
     }
     return out.toString();
+  }
+
+  /**
+   * Adds a unique identifier to the topic to ensure that we will be
+   * able to apply the fragment to the other side.
+   */
+  private void addIdentifier(TopicMapReferenceIF ref, String objid)
+    throws IOException {
+    TopicMapStoreIF store = ref.createStore(false);
+    try {
+      TopicMapIF tm = store.getTopicMap();
+      TopicIF topic = (TopicIF) tm.getObjectById(objid);
+      topic.addSubjectIdentifier(URILocator.create("oid:" + objid));
+      store.commit();
+    } finally {
+      store.close();
+    }
   }
 }

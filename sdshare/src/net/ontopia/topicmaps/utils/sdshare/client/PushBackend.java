@@ -80,6 +80,7 @@ public class PushBackend implements ClientBackendIF {
           fragment.getTopicIIs().isEmpty())
         throw new RuntimeException("Tried making fragment for topic with no " +
                                    "identity!");
+
       for (String si : fragment.getTopicSIs())
         writer.addTopicSI(si);
       for (String sl : fragment.getTopicSLs())
