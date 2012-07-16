@@ -114,6 +114,7 @@
       <pathelement location="${libdir}/junit-3.8.2.jar"/>
       <pathelement location="${libdir}/java-getopt-1.0.9.jar"/>
       <pathelement location="${libdir}/jena-2.6.2.jar"/>
+      <pathelement location="${libdir}/antlr-2.7.7.jar"/>
       <pathelement location="/Users/larsga/workspace/httpcomponents-client-4.0.3/lib/httpclient-4.0.3.jar"/>
       <pathelement location="/Users/larsga/workspace/httpcomponents-core-4.1/lib/httpcore-4.1.jar"/>
       <pathelement location="/Users/larsga/workspace/httpcomponents-core-4.1/lib/httpcore-4.1.jar"/>

@@ -171,7 +171,7 @@ public class OntopiaBackend extends AbstractBackend implements ClientBackendIF {
         MergeUtils.mergeInto(topicmap, oftopic);
 
     // (d) sync the types
-    // FIXME: how the hell do we do this?
+    syncTypes(ftopic, ltopic);
 
     // (e) sync the names
     Map<String, ? extends ReifiableIF> keymap = makeKeyMap(ftopic.getTopicNames(), topicmap);
@@ -190,6 +190,38 @@ public class OntopiaBackend extends AbstractBackend implements ClientBackendIF {
         ltopic.getOccurrences().isEmpty() &&
         ltopic.getRoles().isEmpty())
       ltopic.remove(); // empty topic, therefore remove
+  }
+  
+  // goal: after returning, ltopic is to have the same set of types as
+  // ftopic, after making a minimal number of changes
+  private void syncTypes(TopicIF ftopic, TopicIF ltopic) {
+    // translate the set of types
+    Collection<TopicIF> ftypes = translate(ltopic.getTopicMap(),
+                                           ftopic.getTypes());
+    
+    // first, remove types ltopic has that ftopic doesn't
+    for (TopicIF ltype : new ArrayList<TopicIF>(ltopic.getTypes()))
+      if (!ftypes.contains(ltype))
+        ltopic.removeType(ltype);
+
+    // second, add types ftopic has that ltopic doesn't
+    Collection<TopicIF> ltypes = ltopic.getTypes();
+    for (TopicIF ftype : ftypes)
+      if (!ltypes.contains(ftype))
+        ltopic.addType(ftype);
+  }
+
+  // returns the corresponding set of topics in the local topic map
+  private Collection<TopicIF> translate(TopicMapIF ltm,
+                                        Collection<TopicIF> ftopics) {
+    Collection<TopicIF> ltopics = new CompactHashSet(ftopics.size());
+    for (TopicIF ftopic : ftopics) {
+      TopicIF ltopic = MergeUtils.findTopic(ltm, ftopic);
+      if (ltopic == null)
+        ltopic = MergeUtils.mergeInto(ltm, ftopic);
+      ltopics.add(ltopic);
+    }
+    return ltopics;
   }
 
   private Map<String, ? extends ReifiableIF>

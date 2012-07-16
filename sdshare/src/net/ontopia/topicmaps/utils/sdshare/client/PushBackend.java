@@ -24,7 +24,8 @@ import net.ontopia.topicmaps.utils.sdshare.client.Fragment;
 
 /**
  * INTERNAL: Backend which uses SDshare push to transfer changes to
- * another machine.
+ * another machine. The push endpoint implementation lives in the
+ * sdshare.push package.
  */
 public class PushBackend implements ClientBackendIF {
   static Logger log = LoggerFactory.getLogger(PushBackend.class.getName());

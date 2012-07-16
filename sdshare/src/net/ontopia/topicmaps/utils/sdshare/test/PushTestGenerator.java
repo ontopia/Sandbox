@@ -53,8 +53,7 @@ public class PushTestGenerator implements TestCaseGeneratorIF {
   public Iterator generateTests() {
     Set tests = new CompactHashSet();
     String root = AbstractOntopiaTestCase.getTestDirectory();
-    String base = root + File.separator + "sdshare" +
-      File.separator + "push";
+    String base = root + File.separator + File.separator + "push";
         
     File indir = new File(base);
 

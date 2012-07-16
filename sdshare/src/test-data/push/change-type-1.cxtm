@@ -19,12 +19,12 @@
 <subjectIdentifiers>
 <locator>http://psi.example.org/specification</locator>
 </subjectIdentifiers>
+<rolePlayed ref="association.1.role.2"></rolePlayed>
 </topic>
 <topic number="3">
 <subjectIdentifiers>
 <locator>http://psi.example.org/standard</locator>
 </subjectIdentifiers>
-<rolePlayed ref="association.1.role.2"></rolePlayed>
 </topic>
 <topic number="4">
 <subjectIdentifiers>
@@ -53,7 +53,7 @@
 <type topicref="4"></type>
 </role>
 <role number="2">
-<player topicref="3"></player>
+<player topicref="2"></player>
 <type topicref="6"></type>
 </role>
 </association>
