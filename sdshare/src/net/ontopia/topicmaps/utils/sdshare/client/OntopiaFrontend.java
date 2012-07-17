@@ -21,6 +21,7 @@ import net.ontopia.topicmaps.core.TopicMapStoreIF;
 import net.ontopia.topicmaps.entry.TopicMaps;
 import net.ontopia.topicmaps.entry.TopicMapReferenceIF;
 import net.ontopia.topicmaps.entry.TopicMapRepositoryIF;
+import net.ontopia.topicmaps.xml.XTMFragmentExporter;
 import net.ontopia.topicmaps.xml.XTMTopicMapFragmentWriter;
 import net.ontopia.topicmaps.utils.sdshare.ChangedTopic;
 import net.ontopia.topicmaps.utils.sdshare.DeletedTopic;
@@ -132,7 +133,8 @@ public class OntopiaFrontend implements ClientFrontendIF {
     try {
       TopicMapIF tm = store.getTopicMap();
       TopicIF topic = (TopicIF) tm.getObjectById(objid);
-      topic.addSubjectIdentifier(URILocator.create("oid:" + objid));
+      String psi = XTMFragmentExporter.makeVirtualReference(topic, handle);
+      topic.addSubjectIdentifier(URILocator.create(psi));
       store.commit();
     } finally {
       store.close();
