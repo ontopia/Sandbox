@@ -5287,6 +5287,32 @@
       <resourceData>Ontopia 5.2.1 has just been released. This is a minor release which fixes the vizigator and vizlet in the distribution. For the full details, please see the release notes.</resourceData>
     </occurrence>
   </topic>
+  <topic id="id000000003">
+    <instanceOf>
+      <topicRef xlink:href="#post"></topicRef>
+    </instanceOf>
+    <subjectIdentity>
+      <resourceRef xlink:href="http://ontopia.wordpress.com/2012/11/29/ontopia-5-2-2-released/"></resourceRef>
+    </subjectIdentity>
+    <baseName>
+      <instanceOf>
+        <topicRef xlink:href="#id5"></topicRef>
+      </instanceOf>
+      <baseNameString>Ontopia 5.2.2 released</baseNameString>
+    </baseName>
+    <occurrence>
+      <instanceOf>
+        <topicRef xlink:href="#date"></topicRef>
+      </instanceOf>
+      <resourceData>2012-11-29 17:00:00</resourceData>
+    </occurrence>
+    <occurrence>
+      <instanceOf>
+        <topicRef xlink:href="#description"></topicRef>
+      </instanceOf>
+      <resourceData>Ontopia 5.2.2 has just been released. This release is a bug fix release and introduces some new API methods for TopicIF. For the full details, please see the release notes.</resourceData>
+    </occurrence>
+  </topic>
   <topic id="id3463">
     <instanceOf>
       <topicRef xlink:href="#post"></topicRef>
