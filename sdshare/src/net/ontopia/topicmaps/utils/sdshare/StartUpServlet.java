@@ -64,7 +64,7 @@ public class StartUpServlet extends HttpServlet {
       try {
         TrackerManager.registerTracker(tmid);
       } catch (OntopiaRuntimeException e) {
-        // this *may* mean that there was no such exception. we give a
+        // this *may* mean that there was no such topic map. we give a
         // warning, and soldier on manfully.
         log.error("Exception registering change tracker", e);
       }      

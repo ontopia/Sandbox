@@ -4,8 +4,11 @@ package net.ontopia.topicmaps.utils.sdshare.client;
 import java.util.Set;
 import java.util.Iterator;
 import java.util.Collections;
+import java.io.Reader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
+import java.sql.Timestamp;
 import org.xml.sax.SAXException;
 
 import org.slf4j.Logger;
@@ -34,13 +37,8 @@ import net.ontopia.topicmaps.utils.sdshare.TopicMapTracker;
  */
 public class OntopiaFrontend implements ClientFrontendIF {
   static Logger log = LoggerFactory.getLogger(OntopiaFrontend.class.getName());
-  private String handle; // handle (URL|id) of source collection
-  private TopicMapTracker tracker;
-
-  public OntopiaFrontend(String handle) {
-    this.handle = handle;
-    this.tracker = TrackerManager.registerTracker(handle);
-  }
+  protected String handle; // handle (URL|id) of source collection
+  protected TopicMapTracker tracker;
   
   public String getHandle() {
     return handle;
@@ -50,16 +48,21 @@ public class OntopiaFrontend implements ClientFrontendIF {
     throw new UnsupportedOperationException(); // FIXME: implement!
   }
 
-  public Iterator<FragmentFeed> getFragmentFeeds(long lastChange)
+  public Iterator<FragmentFeed> getFragmentFeeds(Timestamp last)
     throws IOException, SAXException {
+    long lastChange = 0;
+    if (last != null)
+      lastChange = last.getTime(); // FIXME: precision loss
     FragmentFeed feed = new FragmentFeed();
     // FIXME: presumably we need a title and all that jazz, too?
 
     TopicMapRepositoryIF rep = TopicMaps.getRepository();
     TopicMapReferenceIF ref = rep.getReferenceByKey(handle);
+    if (ref == null)
+      throw new OntopiaRuntimeException("No such topic map: '" + handle + "'");
     TopicMapIF topicmap = ref.createStore(true).getTopicMap();
     feed.setPrefix(topicmap.getStore().getBaseAddress().getExternalForm());
-    
+
     for (ChangedTopic topic : tracker.getChangeFeed(lastChange)) {
       Set<String> sis = new CompactHashSet();
       Set<String> iis = new CompactHashSet();
@@ -93,9 +96,11 @@ public class OntopiaFrontend implements ClientFrontendIF {
         fragment = makeFragment(rtopic);
       }
 
-      // FIXME: do we really need to serialize the fragment? could we produce
-      // it on demand instead?
-      Fragment f = new Fragment(null, topic.getTimestamp(), fragment);
+      // the "topic:"-link is interpreted by downloadData() below
+      AtomLink link = new AtomLink(null, "topic:" + topic.getObjectId());
+      Fragment f = new Fragment(Collections.singleton(link),
+                                new Timestamp(topic.getTimestamp()),
+                                null);
       if (!sis.isEmpty())
         f.setTopicSIs(sis);
       if (!sls.isEmpty())
@@ -106,6 +111,11 @@ public class OntopiaFrontend implements ClientFrontendIF {
     }
 
     return Collections.singleton(feed).iterator();
+  }
+
+  public void setSyncSource(SyncSource source) {
+    this.handle = source.getHandle();
+    this.tracker = TrackerManager.registerTracker(handle);
   }
 
   private String makeFragment(TopicIF topic) {
@@ -140,4 +150,23 @@ public class OntopiaFrontend implements ClientFrontendIF {
       store.close();
     }
   }
+
+  /**
+   * Returns a reader which can be used to get a data representation.
+   * Either a snapshot or a fragment.
+   */
+  public Reader downloadData(String uri) throws IOException {
+    // parse uri
+    int pos = uri.indexOf(':');
+    String id = uri.substring(pos + 1);
+    
+    // get topic
+    TopicMapRepositoryIF rep = TopicMaps.getRepository();
+    TopicMapReferenceIF ref = rep.getReferenceByKey(handle);
+    TopicMapIF topicmap = ref.createStore(true).getTopicMap();
+    TopicIF topic = (TopicIF) topicmap.getObjectById(id);
+
+    // return data
+    return new StringReader(makeFragment(topic));
+  }  
 }

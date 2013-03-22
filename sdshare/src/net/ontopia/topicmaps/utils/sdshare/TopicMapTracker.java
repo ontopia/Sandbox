@@ -14,10 +14,14 @@ import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 
+import net.ontopia.utils.DeciderIF;
 import net.ontopia.utils.StringUtils;
+import net.ontopia.utils.OntopiaRuntimeException;
 import net.ontopia.infoset.core.LocatorIF;
 import net.ontopia.infoset.impl.basic.URILocator;
+import net.ontopia.topicmaps.core.TopicIF;
 import net.ontopia.topicmaps.core.TMObjectIF;
+import net.ontopia.topicmaps.core.TopicMapIF;
 import net.ontopia.topicmaps.core.events.TopicMapListenerIF;
 import net.ontopia.topicmaps.entry.TopicMapReferenceIF;
 import net.ontopia.topicmaps.impl.rdbms.RDBMSTopicMapReference;
@@ -39,6 +43,10 @@ public class TopicMapTracker implements TopicMapListenerIF {
   private List<ChangedTopic> changes;
   private Map<String, ChangedTopic> idmap;
   private long lastExpired; // how long (in ms) since we last expired changes
+  /**
+   * Filters which topics to actually include in the feed.
+   */
+  private DeciderIF<TopicIF> filter;
   /**
    * Number of milliseconds changes stay in changes list before they
    * expire.
@@ -123,8 +131,15 @@ public class TopicMapTracker implements TopicMapListenerIF {
     this.dribblefile = dribblefile;
     loadDribbleFile(); // dribbler is set up in here
   }
+
+  public void setFilter(DeciderIF<TopicIF> filter) {
+    this.filter = filter;
+  }
     
   private synchronized void modified(ChangedTopic o) {
+    if (filter != null && !filter(o))
+      return; // checking whether this topic belongs to the feed
+
     expireOldChanges();
     int pos = findDuplicate(o);
     if (pos == -1)
@@ -343,6 +358,16 @@ public class TopicMapTracker implements TopicMapListenerIF {
     for (ChangedTopic ch : changes)
       dribbler.write(ch.getSerialization() + "\n");
     dribbler.flush(); // commit to disk
+  }
+
+  private boolean filter(ChangedTopic t) {
+    try {
+      TopicMapIF tm = ref.createStore(true).getTopicMap();
+      TopicIF topic = (TopicIF) tm.getObjectById(t.getObjectId());
+      return filter.ok(topic);
+    } catch (IOException e) {
+      throw new OntopiaRuntimeException(e);
+    }
   }
   
   // --- TopicMapListenerIF implementation

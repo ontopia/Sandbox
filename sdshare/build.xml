@@ -14,6 +14,7 @@
 
   <!-- Patterns -->
   <patternset id="sources">
+    <include name="src/net/ontopia/topicmaps/test/*.java" />
     <include name="src/net/ontopia/topicmaps/utils/sdshare/*.java" />
     <include name="src/net/ontopia/topicmaps/utils/sdshare/client/*.java" />
     <include name="src/net/ontopia/topicmaps/utils/sdshare/push/*.java" />
@@ -95,6 +96,10 @@
     <copy todir="${build.wars}/sdshare-push" overwrite="yes">
       <fileset dir="${basedir}/src/push-webapp"/>
     </copy>
+    <copy todir="${build.wars}/sdshare-push/WEB-INF/lib" overwrite="yes"
+          file="${build.jars}/sdshare.jar"/>
+    <copy todir="${build.wars}/sdshare-push/WEB-INF/lib" overwrite="yes"
+          file="/Users/larsga/cvs-co/sdshare-client/sdshare-shared/target/sdshare-shared-0.2.0-SNAPSHOT.jar"/>
     
     <delete file="${build.wars}/sdshare-push.war"/>
     <war destfile="${build.wars}/sdshare-push.war"

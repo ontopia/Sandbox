@@ -4,6 +4,7 @@ package net.ontopia.topicmaps.utils.sdshare;
 import java.io.Writer;
 import java.util.TimeZone;
 import java.text.SimpleDateFormat;
+import java.sql.Timestamp;
 import org.xml.sax.helpers.AttributeListImpl;
 import net.ontopia.xml.PrettyPrinter;
 import net.ontopia.infoset.core.LocatorIF;
@@ -24,7 +25,7 @@ public class AtomWriter {
     format.setTimeZone(TimeZone.getTimeZone("Z"));
   }
 
-  public void startFeed(String title, long updated, String id) {
+  public void startFeed(String title, Timestamp updated, String id) {
     out.startDocument();
     atts.addAttribute("xmlns", "CDATA", "http://www.w3.org/2005/Atom");
     atts.addAttribute("xmlns:sdshare", "CDATA",
@@ -63,7 +64,7 @@ public class AtomWriter {
     out.endElement("sdshare:ServerSrcLocatorPrefix");    
   }
 
-  public void startEntry(String title, String id, long updated) {
+  public void startEntry(String title, String id, Timestamp updated) {
     atts.clear();
     out.startElement("entry", atts);
 

@@ -4,6 +4,7 @@ package net.ontopia.topicmaps.utils.sdshare.test;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.sql.Timestamp;
 import net.ontopia.test.*;
 import net.ontopia.topicmaps.utils.sdshare.client.Fragment;
 import net.ontopia.topicmaps.utils.sdshare.client.PushBackend;
@@ -25,31 +26,31 @@ public class PushBackendTest extends AbstractOntopiaTestCase {
   }
 
   public void testEmpty() {
-    backend.applyFragments(null, original);
+    backend.applyFragments(original, null);
     check();
   }
 
   public void test49() {
     makeFragments(49);
-    backend.applyFragments(null, original);
+    backend.applyFragments(original, null);
     check();
   }
 
   public void test50() {
     makeFragments(50);
-    backend.applyFragments(null, original);
+    backend.applyFragments(original, null);
     check();
   }
 
   public void test51() {
     makeFragments(51);
-    backend.applyFragments(null, original);
+    backend.applyFragments(original, null);
     check();
   }
 
   public void test52() {
     makeFragments(52);
-    backend.applyFragments(null, original);
+    backend.applyFragments(original, null);
     check();
   }
   
@@ -68,7 +69,7 @@ public class PushBackendTest extends AbstractOntopiaTestCase {
   
   private void makeFragments(int number) {
     for (int ix = 0; ix < number; ix++) {
-      Fragment f = new Fragment(null, ix, null);
+      Fragment f = new Fragment(null, new Timestamp(ix), null);
       f.setTopicSIs(Collections.singleton("" + ix));
       original.add(f);
     }

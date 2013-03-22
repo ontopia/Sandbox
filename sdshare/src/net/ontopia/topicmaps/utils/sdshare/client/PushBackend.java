@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.InputStreamReader;
+import java.sql.Timestamp;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,15 +28,15 @@ import net.ontopia.topicmaps.utils.sdshare.client.Fragment;
  * another machine. The push endpoint implementation lives in the
  * sdshare.push package.
  */
-public class PushBackend implements ClientBackendIF {
+public class PushBackend extends AbstractBackend implements ClientBackendIF {
   static Logger log = LoggerFactory.getLogger(PushBackend.class.getName());
   private static final int SEGMENT_SIZE = 50;
   
-  public void loadSnapshot(SyncEndpoint endpoint, Snapshot snapshot) {
+  public void loadSnapshot(Snapshot snapshot, URIResolverIF resolver) {
     throw new UnsupportedOperationException(); // not supported yet
   }
 
-  public void applyFragments(SyncEndpoint endpoint, List<Fragment> fragments) {
+  public void applyFragments(List<Fragment> fragments, URIResolverIF resolver) {
     try {
       // first of all, we break the list into a list of smaller list
       // segments, in order to avoid pushing a feed that's too big.
@@ -48,14 +49,15 @@ public class PushBackend implements ClientBackendIF {
       
       // then we loop over the segments, applying each one in turn
       for (List<Fragment> segment : segments)
-        applyFragments_(endpoint, segment);
+        applyFragments_(segment, resolver);
     } catch (IOException e) {
       throw new OntopiaRuntimeException(e);
     }
   }
 
-  protected void applyFragments_(SyncEndpoint endpoint, List<Fragment> fragments)
-    throws IOException {
+  protected void applyFragments_(List<Fragment> fragments,
+                                 URIResolverIF resolver) throws IOException {
+    log.trace("Applying {} fragments", fragments.size());
     FragmentFeed thefeed = null;
     String id = "http://example.org"; // fallback
     if (!fragments.isEmpty())
@@ -68,18 +70,18 @@ public class PushBackend implements ClientBackendIF {
     StringWriter out = new StringWriter();
     AtomWriter writer = new AtomWriter(out);
     writer.startFeed("Ontopia SDshare push client feed",
-                     System.currentTimeMillis(), id);
+                     new Timestamp(System.currentTimeMillis()), id);
     if (thefeed != null)
       writer.addServerPrefix(thefeed.getPrefix());
     
     for (Fragment fragment : fragments) {
       writer.startEntry("Push fragment", "Some id", fragment.getUpdated());
-      writer.addContent(fragment.getContent());
+      writer.addContent(getContent(fragment, resolver));
       if (fragment.getTopicSIs().isEmpty() &&
           fragment.getTopicSLs().isEmpty() &&
           fragment.getTopicIIs().isEmpty())
-        throw new RuntimeException("Tried making fragment for topic with no " +
-                                   "identity!");
+        throw new OntopiaRuntimeException("Tried making fragment for topic " +
+                                          "with no identity!");
 
       for (String si : fragment.getTopicSIs())
         writer.addTopicSI(si);
@@ -94,6 +96,7 @@ public class PushBackend implements ClientBackendIF {
     
     writer.endFeed();
     String feed = out.toString();
+    log.trace("Feed built, {} bytes", feed.length());
 
     // (2) POST the feed to the endpoint
     byte rawdata[] = feed.getBytes("utf-8");
@@ -105,12 +108,29 @@ public class PushBackend implements ClientBackendIF {
     httppost.setEntity(reqbody);
 
     // (3) retrieving the response
-
     HttpResponse response = httpclient.execute(httppost);
     HttpEntity resEntity = response.getEntity();
 
+    log.trace("Feed posted");
+    
     if (response.getStatusLine().getStatusCode() != 200)
       throw new OntopiaRuntimeException("Error sending SDshare push: " +
                                         response.getStatusLine());
+  }
+
+  private String getContent(Fragment fragment, URIResolverIF resolver)
+    throws IOException {
+    if (fragment.getContent() != null)
+      return fragment.getContent();
+
+    AtomLink link = findPreferredLink(fragment.getLinks());    
+    if (link == null)
+      throw new OntopiaRuntimeException("No link or content for " + fragment);
+
+    return StreamUtils.read(resolver.downloadData(link.getUri()));
+  }
+
+  public int getLinkScore(AtomLink link) {
+    return Utils.getLinkScore(link);
   }
 }

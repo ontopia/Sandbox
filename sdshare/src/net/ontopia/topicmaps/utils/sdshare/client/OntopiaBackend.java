@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.io.Reader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ByteArrayInputStream;
+import java.io.StringReader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +34,7 @@ public class OntopiaBackend extends AbstractBackend implements ClientBackendIF {
 
   private TopicMapRepositoryIF repository; // injected from outside
   
-  public void loadSnapshot(SyncEndpoint endpoint, Snapshot snapshot) {
+  public void loadSnapshot(Snapshot snapshot, URIResolverIF resolver) {
     TopicMapStoreIF store = null;
     try {
       String url = findPreferredLink(snapshot.getLinks()).getUri();
@@ -57,7 +57,7 @@ public class OntopiaBackend extends AbstractBackend implements ClientBackendIF {
     }
   }
 
-  public void applyFragments(SyncEndpoint endpoint, List<Fragment> fragments) {
+  public void applyFragments(List<Fragment> fragments, URIResolverIF resolver) {
     if (fragments.isEmpty())
       return; // avoids IndexOutOfBoundsException later
     
@@ -72,7 +72,7 @@ public class OntopiaBackend extends AbstractBackend implements ClientBackendIF {
         String prefix = fragments.get(0).getFeed().getPrefix();
         TopicMapIF topicmap = store.getTopicMap();
         for (Fragment fragment : fragments)
-          applyFragment(prefix, fragment, topicmap);
+          applyFragment(prefix, fragment, topicmap, resolver);
       } catch (Throwable e) {
         store.abort();
         throw new OntopiaRuntimeException(e);
@@ -93,20 +93,7 @@ public class OntopiaBackend extends AbstractBackend implements ClientBackendIF {
   // ===== INTERNAL IMPLEMENTATION CODE
 
   public int getLinkScore(AtomLink link) {
-    MIMEType mimetype = link.getMIMEType();
-    if (!mimetype.getType().equals("application/x-tm+xml"))
-      return 0; // we support only XTM at the moment
-
-    if (mimetype.getVersion() == null)
-      return 1; // don't know what version, so use only if necessary
-    else if (mimetype.getVersion().equals("1.0"))
-      return 2; // doesn't support name types, so not preferred
-    else if (mimetype.getVersion().equals("2.0"))
-      return 99; // has everything, so this is fine
-    else if (mimetype.getVersion().equals("2.1"))
-      return 100; // best support for fragments, so prefer this
-    else
-      return 0; // unknown version, so we don't dare to use it
+    return Utils.getLinkScore(link);
   }
 
   // overriden by test code to sneak in test TM
@@ -119,7 +106,8 @@ public class OntopiaBackend extends AbstractBackend implements ClientBackendIF {
   }
   
   private void applyFragment(String prefix, Fragment fragment,
-                             TopicMapIF topicmap) throws IOException {
+                             TopicMapIF topicmap, URIResolverIF resolver)
+    throws IOException {
     AtomLink link = findPreferredLink(fragment.getLinks());    
     String url = null;
     if (link != null)
@@ -128,13 +116,17 @@ public class OntopiaBackend extends AbstractBackend implements ClientBackendIF {
     if (fragment.getTopicSIs().isEmpty() &&
         fragment.getTopicIIs().isEmpty() &&
         fragment.getTopicSLs().isEmpty())
-      throw new RuntimeException("Fragment " + url + " had no identity");
+      throw new OntopiaRuntimeException("Fragment " + url + " had no identity");
     
     // (1) get the fragment
     // FIXME: for now we only support XTM
-    LocatorIF base = URILocator.create(fragment.getFeed().getPrefix());
-    InputStream stream = getStream(fragment, url);
-    XTMTopicMapReader reader = new XTMTopicMapReader(stream, base);
+    LocatorIF base;
+    if (url != null)
+      base = URILocator.create(url);
+    else
+      base = URILocator.create("http://bogus.workaround.uri"); // for push
+    Reader input = resolve(fragment, url, resolver);
+    XTMTopicMapReader reader = new XTMTopicMapReader(input, base);
     reader.setFollowTopicRefs(false);
     TopicMapIF tmfragment = reader.read();
     
@@ -306,12 +298,12 @@ public class OntopiaBackend extends AbstractBackend implements ClientBackendIF {
     return assocs;
   }  
 
-  private InputStream getStream(Fragment fragment, String url)
+  private Reader resolve(Fragment fragment, String url, URIResolverIF resolver)
     throws IOException {
     if (url != null)
-      return new URL(url).openConnection().getInputStream();
+      return resolver.downloadData(url);
     else if (fragment.getContent() != null)
-      return new ByteArrayInputStream(fragment.getContent().getBytes("utf-8"));
+      return new StringReader(fragment.getContent());
     else
       throw new OntopiaRuntimeException("Fragment contained neither " +
                                         "acceptable links nor content");

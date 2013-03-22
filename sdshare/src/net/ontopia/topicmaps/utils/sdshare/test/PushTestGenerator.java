@@ -91,7 +91,7 @@ public class PushTestGenerator implements TestCaseGeneratorIF {
       SyncEndpoint endpoint = new SyncEndpoint(null); // dummy; not used
       for (File feedfile : feeds) {
         FragmentFeed feed = FeedReaders.readPostFeed(new FileReader(feedfile));
-        backend.applyFragments(endpoint, feed.getFragments());
+        backend.applyFragments(feed.getFragments(), null);
 
         String name = feedfile.getName().substring(0, feedfile.getName().length() - 5);
         // canonicalize

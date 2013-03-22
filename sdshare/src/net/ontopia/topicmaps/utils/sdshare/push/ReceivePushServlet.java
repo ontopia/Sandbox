@@ -50,8 +50,9 @@ public class ReceivePushServlet extends HttpServlet {
       throw new OntopiaRuntimeException(e);
     }
     SyncEndpoint endpoint = new SyncEndpoint(handle);
+    backend.setEndpoint(endpoint);
     
     // (2) run through the feed, and apply each fragment into the backend
-    backend.applyFragments(endpoint, feed.getFragments());
+    backend.applyFragments(feed.getFragments(), null); // FIXME: !null
   }
 }
