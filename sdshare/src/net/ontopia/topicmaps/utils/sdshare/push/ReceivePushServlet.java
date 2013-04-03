@@ -8,6 +8,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.xml.sax.SAXException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.ontopia.utils.OntopiaRuntimeException;
 import net.ontopia.topicmaps.nav2.utils.NavigatorUtils;
 import net.ontopia.topicmaps.utils.sdshare.client.Fragment;
@@ -25,13 +28,23 @@ import net.ontopia.topicmaps.utils.sdshare.client.ClientBackendIF;
  * endpoint handle (topic map ID).
  */
 public class ReceivePushServlet extends HttpServlet {
+  static Logger log = LoggerFactory.getLogger(ReceivePushServlet.class.getName());
   private ClientBackendIF backend;  
 
   public ReceivePushServlet() {
     this.backend = new OntopiaBackend(); // FIXME: don't hard-wire
   }
+
+  protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
+    try {
+      doPost_(req, resp);
+    } catch (Throwable e) {
+      log.error("SDShare push request failed", e);
+      throw new OntopiaRuntimeException(e);
+    }
+  }
   
-  protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+  protected void doPost_(HttpServletRequest req, HttpServletResponse resp)
     throws IOException {
     // (0) connect to topic map repository
     ((OntopiaBackend) backend).setRepository(NavigatorUtils.getTopicMapRepository(getServletContext()));
