@@ -265,7 +265,7 @@ public class OntopiaBackend extends AbstractBackend implements ClientBackendIF {
   }
 
   private void pruneItemIdentifiers(TMObjectIF object, String prefix) {
-    for (LocatorIF iid : object.getItemIdentifiers())
+    for (LocatorIF iid : new ArrayList<LocatorIF>(object.getItemIdentifiers()))
       if (iid.getAddress().startsWith(prefix))
         object.removeItemIdentifier(iid);
   }

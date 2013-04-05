@@ -2,7 +2,9 @@
 package net.ontopia.topicmaps.utils.sdshare.client;
 
 import java.util.Set;
+import java.util.List;
 import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.io.Reader;
 import java.io.IOException;
@@ -63,7 +65,9 @@ public class OntopiaFrontend implements ClientFrontendIF {
     TopicMapIF topicmap = ref.createStore(true).getTopicMap();
     feed.setPrefix(topicmap.getStore().getBaseAddress().getExternalForm());
 
-    for (ChangedTopic topic : tracker.getChangeFeed(lastChange)) {
+    // must make a copy, since list can change while we're working
+    List<ChangedTopic> changes = new ArrayList(tracker.getChangeFeed(lastChange));
+    for (ChangedTopic topic : changes) {
       Set<String> sis = new CompactHashSet();
       Set<String> iis = new CompactHashSet();
       Set<String> sls = new CompactHashSet();
@@ -79,20 +83,27 @@ public class OntopiaFrontend implements ClientFrontendIF {
       } else {
         TopicIF rtopic = (TopicIF) topicmap.getObjectById(topic.getObjectId());
 
-        // we need to check if this topic has any identifiers at all.
-        // because if it doesn't, then we will be in deep trouble
-        // later.
-        if (rtopic.getItemIdentifiers().isEmpty() &&
-            rtopic.getSubjectIdentifiers().isEmpty() &&
-            rtopic.getSubjectLocators().isEmpty())
-          addIdentifier(ref, topic.getObjectId());
-            
-        for (LocatorIF si : rtopic.getSubjectIdentifiers())
-          sis.add(si.getExternalForm());
-        for (LocatorIF sl : rtopic.getSubjectLocators())
-          sls.add(sl.getExternalForm());
-        for (LocatorIF ii : rtopic.getItemIdentifiers())
-          iis.add(ii.getExternalForm());
+        if (rtopic != null) {
+          // we need to check if this topic has any identifiers at all.
+          // because if it doesn't, then we will be in deep trouble
+          // later.
+          if (rtopic.getItemIdentifiers().isEmpty() &&
+              rtopic.getSubjectIdentifiers().isEmpty() &&
+              rtopic.getSubjectLocators().isEmpty())
+            addIdentifier(ref, topic.getObjectId());
+          
+          for (LocatorIF si : rtopic.getSubjectIdentifiers())
+            sis.add(si.getExternalForm());
+          for (LocatorIF sl : rtopic.getSubjectLocators())
+            sls.add(sl.getExternalForm());
+          for (LocatorIF ii : rtopic.getItemIdentifiers())
+            iis.add(ii.getExternalForm());
+        } else {
+          // the topic has been deleted, but for some unknown reason we don't
+          // have a DeletedTopic for it. anyway, we work around it.
+          sis.add(makeVirtualReference(topic.getObjectId()));
+        }
+          
         fragment = makeFragment(rtopic);
       }
 
@@ -143,7 +154,7 @@ public class OntopiaFrontend implements ClientFrontendIF {
     try {
       TopicMapIF tm = store.getTopicMap();
       TopicIF topic = (TopicIF) tm.getObjectById(objid);
-      String psi = XTMFragmentExporter.makeVirtualReference(topic, handle);
+      String psi = makeVirtualReference(objid);
       topic.addSubjectIdentifier(URILocator.create(psi));
       store.commit();
     } finally {
@@ -151,6 +162,18 @@ public class OntopiaFrontend implements ClientFrontendIF {
     }
   }
 
+  /**
+   * Creates a unique identifier used for topics which have no other
+   * identifier.
+   */
+  // originally this was the identifier scheme used:
+  //   XTMFragmentExporter.makeVirtualReference(topic, handle)
+  // for reasons too embarrassing to reproduce here, we changed to oid:xxx
+  // so that it will work for NRK/Skole
+  private String makeVirtualReference(String objid) {
+    return "oid:" + objid;
+  }
+  
   /**
    * Returns a reader which can be used to get a data representation.
    * Either a snapshot or a fragment.
