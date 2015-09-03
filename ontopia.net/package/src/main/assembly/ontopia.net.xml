@@ -1,0 +1,162 @@
+<?xml version="1.0"?>
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+	<id>ontopia-dist</id>
+	
+	<formats>
+		<format>dir</format>
+	</formats>
+
+	<includeBaseDirectory>false</includeBaseDirectory>
+	
+	<fileSets>
+		<!-- Move tomcat to the correct location -->
+		<fileSet>
+			<directory>target/apache-tomcat-${tomcat.version}/apache-tomcat-${tomcat.version}</directory>
+			<outputDirectory>/</outputDirectory>
+			<excludes>
+				<!-- exclude the default webapps -->
+				<exclude>webapps/**</exclude>
+				
+				<!-- exclude all runnable files, copied later with correct mods -->
+				<exclude>bin/*.sh</exclude>
+
+				<!-- exlude windows -->
+				<exclude>bin/*.bat</exclude>
+
+				<!-- exlude placholders and info -->
+				<exclude>LICENSE</exclude>
+				<exclude>NOTICE</exclude>
+				<exclude>RELEASE-NOTES</exclude>
+				<exclude>RUNNING.txt</exclude>
+				<exclude>temp/safeToDelete.tmp</exclude>
+			</excludes>
+		</fileSet>
+		
+		<!-- chmod runnable files -->
+		<fileSet>
+			<directory>target/apache-tomcat-${tomcat.version}/apache-tomcat-${tomcat.version}/bin</directory>
+			<outputDirectory>/bin</outputDirectory>
+			<fileMode>0755</fileMode>
+			<includes>
+				<include>*.sh</include>
+			</includes>
+		</fileSet>
+			
+		<!-- copy modified configuration to distribution -->
+		<fileSet>
+			<directory>src/main/assembly/resources/</directory>
+			<outputDirectory>.</outputDirectory>
+			<fileMode>0644</fileMode>
+			<excludes>
+				<exclude>bin/*.sh</exclude>
+			</excludes>
+		</fileSet>
+		
+		<!-- copy executable files -->
+		<fileSet>
+			<directory>src/main/assembly/resources</directory>
+			<outputDirectory>.</outputDirectory>
+			<fileMode>0755</fileMode>
+			<filtered>true</filtered>
+			<includes>
+				<include>bin/*.sh</include>
+			</includes>
+		</fileSet>
+	</fileSets>
+	
+	<dependencySets>
+		<dependencySet>
+			<outputDirectory>lib/ontopia</outputDirectory>
+			<excludes>
+				<exclude>*:war:*</exclude>
+				<exclude>*:vizlet:*</exclude>
+				<exclude>*:standard:*</exclude>
+				<exclude>*:crimson:*</exclude>
+			</excludes>
+			<useTransitiveDependencies>true</useTransitiveDependencies>
+		</dependencySet>
+		
+		<!-- add ROOT webapp -->
+		<dependencySet>
+			<includes><include>*:webapp:war</include></includes>
+			<outputDirectory>webapps/ROOT</outputDirectory>
+			<unpack>true</unpack>
+			<unpackOptions>
+				<excludes>
+					<exclude>WEB-INF/lib/**</exclude>
+					<exclude>WEB-INF/classes/**</exclude>
+					<exclude>META-INF/**</exclude>
+				</excludes>
+			</unpackOptions>
+		</dependencySet>
+		
+		<!-- add i18n webapp -->
+		<dependencySet>
+			<includes><include>*:webapp-i18n:war</include></includes>
+			<outputDirectory>webapps/i18n</outputDirectory>
+			<unpack>true</unpack>
+			<unpackOptions>
+				<excludes>
+					<exclude>WEB-INF/lib/**</exclude>
+					<exclude>WEB-INF/classes/**</exclude>
+					<exclude>META-INF/**</exclude>
+				</excludes>
+			</unpackOptions>
+		</dependencySet>
+		
+		<!-- add omnigator -->
+		<dependencySet>
+			<includes><include>*:webapp-omnigator:war</include></includes>
+			<outputDirectory>webapps/omnigator</outputDirectory>
+			<unpack>true</unpack>
+			<unpackOptions>
+				<excludes>
+					<exclude>WEB-INF/lib/**</exclude>
+					<exclude>WEB-INF/classes/jsp/**</exclude>
+					<exclude>META-INF/**</exclude>
+				</excludes>
+			</unpackOptions>
+		</dependencySet>
+		
+		<!-- add tmrap -->
+		<dependencySet>
+			<includes><include>*:webapp-tmrap:war</include></includes>
+			<outputDirectory>webapps/tmrap</outputDirectory>
+			<unpack>true</unpack>
+			<unpackOptions>
+				<excludes>
+					<exclude>META-INF/**</exclude>
+					<!-- exclude all shared ontopia jar's -->
+					<exclude>WEB-INF/lib/antlr*</exclude>
+					<exclude>WEB-INF/lib/commons-collections*</exclude>
+					<exclude>WEB-INF/lib/commons-dbcp*</exclude>
+					<exclude>WEB-INF/lib/commons-fileupload*</exclude>
+					<exclude>WEB-INF/lib/commons-io*</exclude>
+					<exclude>WEB-INF/lib/commons-logging*</exclude>
+					<exclude>WEB-INF/lib/commons-pool*</exclude>
+					<exclude>WEB-INF/lib/concurrent*</exclude>
+					<exclude>WEB-INF/lib/geronimo-stax-api_1.0_spec*</exclude>
+					<exclude>WEB-INF/lib/icu4j*</exclude>
+					<exclude>WEB-INF/lib/iri*</exclude>
+					<exclude>WEB-INF/lib/java-getopt*</exclude>
+					<exclude>WEB-INF/lib/jena*</exclude>
+					<exclude>WEB-INF/lib/jgroups*</exclude>
+					<exclude>WEB-INF/lib/jing*</exclude>
+					<exclude>WEB-INF/lib/jstl*</exclude>
+					<exclude>WEB-INF/lib/jtidy*</exclude>
+					<exclude>WEB-INF/lib/log4j*</exclude>
+					<exclude>WEB-INF/lib/lucene*</exclude>
+					<exclude>WEB-INF/lib/ontopia*</exclude>
+					<exclude>WEB-INF/lib/slf4j*</exclude>
+					<exclude>WEB-INF/lib/standard*</exclude>
+					<exclude>WEB-INF/lib/tagsoup*</exclude>
+					<exclude>WEB-INF/lib/tmapi*</exclude>
+					<exclude>WEB-INF/lib/trove4j*</exclude>
+					<exclude>WEB-INF/lib/xercesImpl*</exclude>
+					<exclude>WEB-INF/lib/servlet-api*</exclude>
+				</excludes>
+			</unpackOptions>
+		</dependencySet>
+	</dependencySets>
+
+</assembly>
