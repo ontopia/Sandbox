@@ -14,7 +14,7 @@
 <p>&nbsp;</p>
 
 <div id="success">
-  <a href="http://code.google.com/p/ontopia/downloads/list"
+  <a href="https://github.com/ontopia/ontopia/releases"
     ><img src="images/download-big.png"></a>
 </div>
 
