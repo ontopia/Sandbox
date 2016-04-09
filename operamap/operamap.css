@@ -1,0 +1,87 @@
+/* $Id: operamap.css,v 1.6 2001/12/05 15:13:28 pepper Exp $ */
+
+/* ---- Document wide general Layout ---- */
+
+body {
+  background-color: #990033;
+  color: #FFFFFF;
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
+body, p, h1, h2, h3, h4, ul, ol, li, div, td, th, address, blockquote, nobr, b, i {
+  font-family: Verdana, Geneva, Arial, sans-serif;
+}
+
+/* ---- Definition of Specific Font-Related classes ---- */
+
+h1 {
+  font-size: 16pt;
+  font-weight: bold;
+  margin: 2px;
+}
+
+h2 {
+  font-size: 14pt;
+  font-weight: bold;
+  margin: 2px;
+}
+
+h3 {
+  font-size: 12pt;
+  font-weight: bold;
+  margin: 2px;
+}
+
+h4 {
+  font-size: 11pt;
+  font-weight: bold;
+  margin: 2px;
+}
+
+
+body, p, ul, ol, li, div, td, th, address, nobr, b, i, input, textarea {
+  font-size: 10pt;
+}
+
+.subhead {
+  font-style: italic;
+  margin-top: 0px;
+  margin-bottom: 0px
+}
+
+.compact {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.searchBox {
+  background-color: #8C8C8C;
+  border: 2px solid #FFFFFF;
+  /* margin: 2px; */
+}
+
+/* ---- Link Style Definition ---- */
+
+img {
+  background-color: white;
+}
+
+a:link {
+  color: #e5ca79;
+  text-decoration: none;
+}
+
+a:visited {
+  color: #e5ca79;
+  text-decoration: none;
+}
+
+a:active {
+  color: #e5ca79;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline
+}
